@@ -1,0 +1,45 @@
+﻿/* =============================================
+   DESIGN TOKENS
+============================================= */
+:root {
+  --teal:        #8BBFC4;
+  --teal-light:  #b8d9dc;
+  --teal-pale:   #e8f4f5;
+  --teal-dark:   #5f9ea4;
+  --navy:        #1a2e40;
+  --navy-mid:    #2d4a63;
+  --white:       #ffffff;
+  --off-white:   #f7fafa;
+  --black:       #111111;
+  --gray:        #6b7a7d;
+  --gray-light:  #dce8e9;
+  --red:         #c0392b;
+  --amber-pale:  #fdf3e3;
+  --amber-dark:  #9a6a1a;
+
+  --radius-sm:   8px;
+  --radius-md:   10px;
+  --radius-lg:   14px;
+  --radius-pill: 30px;
+
+  --shadow-sm: 0 1px 4px rgba(0,0,0,.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.09);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,.14);
+
+  --transition: .16s ease;
+}
+
+/* =============================================
+   RESET & BASE
+============================================= */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--off-white);
+  color: var(--black);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+button { font-family: 'DM Sans', sans-serif; cursor: pointer; }
+input, textarea, select { font-family: 'DM Sans', sans-serif; }

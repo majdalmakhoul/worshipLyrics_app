@@ -1,0 +1,243 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Worship Lyrics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="src/styles/global.css">
+<link rel="stylesheet" href="src/styles/layout.css">
+<link rel="stylesheet" href="src/styles/components.css">
+<link rel="stylesheet" href="src/styles/slideshow.css">
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     SLIDESHOW OVERLAY
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<div id="slideshow" role="dialog" aria-modal="true" aria-label="Lyrics slideshow">
+
+  <div class="ss-bar">
+    <span class="ss-bar__title" id="ssTitle"></span>
+    <div class="ss-bar__langs" id="ssLangTabs"></div>
+    <div class="ss-sep"></div>
+    <button class="ss-close" aria-label="Close">&times;</button>
+  </div>
+
+  <div class="ss-presenter">
+    <section class="ss-pane ss-pane--current" aria-label="Presenter current slide">
+      <div class="ss-pane__label">Current slide</div>
+      <div class="ss-stage" id="ssStage">
+        <div class="ss-section-label" id="ssSectionLabel"></div>
+        <p class="ss-slide-text" id="ssText"></p>
+      </div>
+    </section>
+    <aside class="ss-pane ss-pane--next" aria-label="Presenter next slide">
+      <div class="ss-pane__label">Next slide</div>
+      <div class="ss-next-preview">
+        <p class="ss-next-text" id="ssNextText"></p>
+      </div>
+    </aside>
+  </div>
+
+  <div class="ss-tray" id="ssTray"></div>
+
+  <div class="ss-footer">
+    <button class="ss-nav" id="ssPrev">
+      <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+      Prev
+    </button>
+    <span class="ss-progress" id="ssProgress"></span>
+    <button class="ss-nav" id="ssNextBtn">
+      Next
+      <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
+    <button class="ss-nav" id="ssProjectionBtn">Slideshow view</button>
+    <span class="ss-progress" id="ssProjStatus"></span>
+    <span class="ss-hint">Right next &nbsp;·&nbsp; Left prev &nbsp;·&nbsp; Esc close</span>
+  </div>
+
+</div>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     DEV PANEL
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<div id="devPanel" role="dialog" aria-modal="true" aria-label="Dev panel">
+  <div class="dev-modal">
+
+    <div class="dev-modal__header">
+      <div class="dev-modal__header-left">
+        <span class="dev-badge">Dev</span>
+        <span class="dev-modal__title" id="devTitle">Add Song</span>
+      </div>
+      <button class="dev-modal__close">&times;</button>
+    </div>
+
+    <div class="dev-tabs">
+      <button class="dev-tab active" id="devTabAdd"   >Add / Edit</button>
+      <button class="dev-tab"        id="devTabManage">Manage Songs</button>
+    </div>
+
+    <!-- ADD TAB -->
+    <div id="devContentAdd">
+      <div class="dev-body">
+        <div class="dev-top-actions">
+          <button class="btn-primary" id="devSaveTop">Save song</button>
+        </div>
+
+        <div class="dev-section">
+          <div class="dev-section__label">Song info</div>
+          <div class="dev-grid-3">
+            <div class="dev-field">
+              <label class="dev-field__label" for="fCat">Category</label>
+              <select class="dev-select" id="fCat">
+                <option value="praise">Praise</option>
+                <option value="worship">Worship</option>
+                <option value="prayer">Prayer</option>
+              </select>
+            </div>
+            <div class="dev-field">
+              <label class="dev-field__label" for="fMainLang">Main language</label>
+              <select class="dev-select" id="fMainLang">
+                <option value="arabic">Arabic</option>
+                <option value="arabizi">Arabizi</option>
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+              </select>
+            </div>
+            <label class="dev-option-row" for="fShowLabels">
+              <input id="fShowLabels" type="checkbox">
+              <span>Show verse / chorus labels</span>
+            </label>
+          </div>
+          <div class="dev-grid-3">
+            <label class="dev-option-row" id="arabiziToggleWrap" for="fHasArabizi">
+              <input id="fHasArabizi" type="checkbox" checked>
+              <span>Arabic song has Arabizi</span>
+            </label>
+            <div class="dev-field dev-field--wide">
+              <label class="dev-field__label" for="fArabizi">Arabizi title</label>
+              <input class="dev-input" id="fArabizi" type="text" placeholder="e.g. Ya Rab">
+            </div>
+          </div>
+          <div class="dev-grid-3">
+            <div class="dev-field">
+              <label class="dev-field__label" for="fArabic">Arabic <span>عربي</span></label>
+              <input class="dev-input rtl" id="fArabic" type="text" placeholder="يا رب">
+            </div>
+            <div class="dev-field">
+              <label class="dev-field__label" for="fEn">English</label>
+              <input class="dev-input" id="fEn" type="text" placeholder="Oh Lord">
+            </div>
+            <div class="dev-field">
+              <label class="dev-field__label" for="fFr">Français</label>
+              <input class="dev-input" id="fFr" type="text" placeholder="Ô Seigneur">
+            </div>
+          </div>
+        </div>
+
+        <!-- Smart lyrics parser -->
+        <div class="dev-section">
+          <div class="dev-section__label">Smart lyrics input</div>
+          <div class="smart-parse-area">
+            <div class="smart-parse-area__header">
+              <span class="smart-parse-area__title">Paste full lyrics - auto-split into slides</span>
+              <button class="btn-parse" id="btnParse">
+                <span class="btn-parse__spinner"></span>
+                <span class="btn-parse__text">
+                  <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="btn-parse__icon"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/></svg>
+                  Auto-split
+                </span>
+              </button>
+            </div>
+            <div class="smart-lang-tabs" id="smartLangTabs">
+              <button class="smart-lang-tab active" data-smart-lang="arabizi">Arabizi</button>
+              <button class="smart-lang-tab" data-smart-lang="arabic">Arabic عربي</button>
+              <button class="smart-lang-tab" data-smart-lang="en">English</button>
+              <button class="smart-lang-tab" data-smart-lang="fr">Français</button>
+            </div>
+            <div class="smart-textareas">
+              <textarea class="smart-textarea"     id="rawArabizi" placeholder="Paste Arabizi lyrics here…"></textarea>
+              <textarea class="smart-textarea rtl" id="rawArabic"  placeholder="الصق الكلمات العربية هنا…"></textarea>
+              <textarea class="smart-textarea"     id="rawEn"      placeholder="Paste English lyrics here…"></textarea>
+              <textarea class="smart-textarea"     id="rawFr"      placeholder="Collez les paroles ici…"></textarea>
+              <p class="smart-hint">Paste lyrics in one or more languages then click <strong>Auto-split</strong>. Each language is processed independently.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Manual slide builder -->
+        <div class="dev-section">
+          <div class="dev-section__label">Slides (auto-filled or edit manually)</div>
+          <div class="slides-builder" id="slidesBuilder"></div>
+          <button class="btn-add-slide" id="devAddSlideBtn">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+            Add slide manually
+          </button>
+        </div>
+
+      </div>
+      <div class="dev-footer">
+        <span class="dev-footer__left" id="devEditNote"></span>
+        <div class="dev-footer__right">
+          <button class="btn-secondary" id="devResetBtn">Reset</button>
+          <button class="btn-primary" id="devSaveFooter">Save song</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MANAGE TAB -->
+    <div id="devContentManage">
+      <div class="dev-body dev-body--compact">
+        <div class="manager-list" id="managerList"></div>
+      </div>
+      <div class="dev-footer">
+        <span class="dev-footer__left" id="managerCount"></span>
+        <div class="dev-footer__right">
+          <button class="btn-secondary btn-secondary--accent" id="devExportBtn">Export JSON</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     MAIN APP
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<header class="site-header">
+  <p class="site-header__ornament">✦ ✦ ✦</p>
+  <h1 class="site-header__title">Worship Lyrics</h1>
+  <p class="site-header__sub">Arabic · Arabizi · English · Français</p>
+</header>
+
+<main class="container">
+
+  <div class="search-bar search-bar--main">
+    <svg class="search-bar__icon" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#5f9ea4" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="search" id="searchInput" placeholder="Search in Arabic, Arabizi, English, Français…" autocomplete="off" aria-label="Search songs">
+    <button class="search-bar__clear" id="clearBtn" aria-label="Clear search">&times;</button>
+  </div>
+
+  <nav aria-label="Filter by language" class="lang-filter" id="langFilter"></nav>
+
+  <p class="results-meta" id="resultsMeta" aria-live="polite"></p>
+  <div class="song-list"  id="songList"    role="list"></div>
+  <div class="pagination" id="pagination"  role="navigation" aria-label="Song pages"></div>
+
+</main>
+
+<footer class="site-footer">Arabic Bible Baptist Church · Montreal</footer>
+<script src="src/js/data.js"></script>
+<script src="src/js/search.js"></script>
+<script src="src/js/projection.js"></script>
+<script src="src/js/render.js"></script>
+<script src="src/js/slideshow.js"></script>
+<script src="src/js/main.js"></script>
+</body>
+</html>
+
+
