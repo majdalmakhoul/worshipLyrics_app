@@ -27,23 +27,14 @@
     <button class="ss-close" aria-label="Close">&times;</button>
   </div>
 
-  <div class="ss-presenter">
-    <section class="ss-pane ss-pane--current" aria-label="Presenter current slide">
-      <div class="ss-pane__label">Current slide</div>
+  <div class="ss-view">
+    <section class="ss-pane ss-pane--current" aria-label="Current slide">
       <div class="ss-stage" id="ssStage">
         <div class="ss-section-label" id="ssSectionLabel"></div>
         <p class="ss-slide-text" id="ssText"></p>
       </div>
     </section>
-    <aside class="ss-pane ss-pane--next" aria-label="Presenter next slide">
-      <div class="ss-pane__label">Next slide</div>
-      <div class="ss-next-preview">
-        <p class="ss-next-text" id="ssNextText"></p>
-      </div>
-    </aside>
   </div>
-
-  <div class="ss-tray" id="ssTray"></div>
 
   <div class="ss-footer">
     <button class="ss-nav" id="ssPrev">
@@ -55,8 +46,6 @@
       Next
       <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
     </button>
-    <button class="ss-nav" id="ssProjectionBtn">Slideshow view</button>
-    <span class="ss-progress" id="ssProjStatus"></span>
     <span class="ss-hint">Right next &nbsp;·&nbsp; Left prev &nbsp;·&nbsp; Esc close</span>
   </div>
 
@@ -197,6 +186,7 @@
       <div class="dev-footer">
         <span class="dev-footer__left" id="managerCount"></span>
         <div class="dev-footer__right">
+          <button class="btn-secondary" id="devJsonFileBtn">Connect JSON</button>
           <button class="btn-secondary btn-secondary--accent" id="devExportBtn">Export JSON</button>
         </div>
       </div>

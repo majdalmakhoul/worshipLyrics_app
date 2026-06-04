@@ -468,7 +468,7 @@ function devLoadSong(song) {
   devSwitchTab('add');
 }
 
-function devSaveSong() {
+async function devSaveSong() {
   const mainLang = document.getElementById('fMainLang').value;
   const hasArabizi = mainLang === 'arabic' ? document.getElementById('fHasArabizi').checked : true;
   const showLabels = document.getElementById('fShowLabels').checked;
@@ -505,7 +505,7 @@ function devSaveSong() {
     showToast(`"${titles[mainLang]}" added`);
   }
 
-  dbSave(DB);
+  await dbSave(DB);
   devResetForm();
   render();
 }
@@ -530,12 +530,17 @@ function devRenderManager() {
 }
 
 function devEditSong(id)   { const s=DB.find(s=>s.id===id); if(s) devLoadSong(s); }
-function devDeleteSong(id) {
+async function devDeleteSong(id) {
   const s=DB.find(s=>s.id===id); if(!s) return;
   if(!confirm(`Delete "${songTitle(s)}"? This cannot be undone.`)) return;
-  DB=DB.filter(x=>x.id!==id); dbSave(DB);
+  DB=DB.filter(x=>x.id!==id); await dbSave(DB);
   showToast(`"${songTitle(s)}" deleted`);
   devRenderManager(); render();
+}
+
+async function devConnectJsonFile() {
+  await dbConnectJsonFile();
+  devRenderManager();
 }
 
 function devExport() {

@@ -55,7 +55,6 @@ function wireSlideshowControls() {
   document.querySelector('.ss-pane--current')?.addEventListener('click', ssAdv);
   document.getElementById('ssPrev')?.addEventListener('click', e => ssStep(-1, e));
   document.getElementById('ssNextBtn')?.addEventListener('click', e => ssStep(1, e));
-  document.getElementById('ssProjectionBtn')?.addEventListener('click', ssOpenProjectionView);
 }
 
 function wireDevPanelControls() {
@@ -65,6 +64,7 @@ function wireDevPanelControls() {
   document.getElementById('devSaveTop')?.addEventListener('click', devSaveSong);
   document.getElementById('devSaveFooter')?.addEventListener('click', devSaveSong);
   document.getElementById('devResetBtn')?.addEventListener('click', devResetForm);
+  document.getElementById('devJsonFileBtn')?.addEventListener('click', devConnectJsonFile);
   document.getElementById('devExportBtn')?.addEventListener('click', devExport);
   document.getElementById('devAddSlideBtn')?.addEventListener('click', () => devAddSlide());
   document.getElementById('fMainLang')?.addEventListener('change', devSyncLanguageOptions);
@@ -78,7 +78,7 @@ function wireDevPanelControls() {
   });
 }
 
-function initApp() {
+async function initApp() {
   wireSearchControls();
   wireSlideshowControls();
   wireDevPanelControls();
@@ -86,6 +86,7 @@ function initApp() {
   document.addEventListener('keydown', handleGlobalKeydown);
   document.addEventListener('fullscreenchange', handleFullscreenChange);
 
+  await dbLoadFromJsonFile();
   buildLangFilter();
   render();
 }

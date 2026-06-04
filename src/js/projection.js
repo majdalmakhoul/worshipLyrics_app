@@ -68,12 +68,10 @@ function projOpen() {
 
   if(!Proj.win) {
     showToast('Pop-up blocked - allow pop-ups and try again');
-    ssUpdateProjectionStatus();
     return;
   }
 
   Proj.active = true;
-  ssUpdateProjectionStatus();
   Proj.win.document.open();
   Proj.win.document.write(projHTML());
   Proj.win.document.close();
@@ -91,7 +89,7 @@ function projOpen() {
   }, 900);
 
   const poll = setInterval(()=>{
-    if(Proj.win?.closed){ Proj.active=false; Proj.win=null; ssUpdateProjectionStatus(); clearInterval(poll); }
+    if(Proj.win?.closed){ Proj.active=false; Proj.win=null; clearInterval(poll); }
   }, 1000);
 }
 
@@ -99,7 +97,6 @@ function projClose() {
   Proj.active=false;
   if(Proj.win && !Proj.win.closed) Proj.win.close();
   Proj.win=null;
-  ssUpdateProjectionStatus();
 }
 
 function projPush() {

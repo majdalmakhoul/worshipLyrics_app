@@ -2,6 +2,10 @@
    CONSTANTS & STORAGE
 ================================================================ */
 const STORAGE_KEY   = 'worship_songs_v1';
+const SONGS_FILE_DB = 'worship_song_file_store';
+const SONGS_FILE_STORE = 'handles';
+const SONGS_FILE_KEY = 'songs-json';
+const SONGS_FILE_NAME = 'worship-songs.json';
 const SONGS_PER_PAGE = 10;
 const LANG_LABELS   = { arabizi:'Arabizi', arabic:'عربي', en:'English', fr:'Français' };
 const LANG_FILTER_LABELS = {
@@ -22,6 +26,8 @@ const DEFAULT_SONGS = [
   // Add starter songs here using the same shape exported by the dev panel JSON.
 ];
 
+let SongsFileHandle = null;
+
 function cloneDefaultSongs() {
   return JSON.parse(JSON.stringify(DEFAULT_SONGS));
 }
@@ -34,7 +40,8 @@ function dbLoad() {
     return cloneDefaultSongs();
   }
 }
-function dbSave(arr)  { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+function dbSaveLocal(arr)  { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+function dbSave(arr) { return dbPersistSongs(arr); }
 
 let DB = dbLoad();  // master song array
 
@@ -59,6 +66,147 @@ function normalizeSong(song) {
 }
 
 DB = DB.map(normalizeSong);
+dbSaveLocal(DB);
+
+function dbJsonText(arr = DB) {
+  return `${JSON.stringify(arr.map(normalizeSong), null, 2)}\n`;
+}
+
+function songFileApiSupported() {
+  return 'showSaveFilePicker' in window && 'indexedDB' in window;
+}
+
+function songFileOpenStore(mode = 'readonly') {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(SONGS_FILE_DB, 1);
+    request.onupgradeneeded = () => request.result.createObjectStore(SONGS_FILE_STORE);
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => {
+      try {
+        const tx = request.result.transaction(SONGS_FILE_STORE, mode);
+        resolve({ db: request.result, tx, store: tx.objectStore(SONGS_FILE_STORE) });
+      } catch(e) {
+        request.result.close();
+        reject(e);
+      }
+    };
+  });
+}
+
+function songFileGetHandle() {
+  if(SongsFileHandle) return Promise.resolve(SongsFileHandle);
+  if(!songFileApiSupported()) return Promise.resolve(null);
+  return new Promise(async resolve => {
+    try {
+      const { db, store } = await songFileOpenStore();
+      const request = store.get(SONGS_FILE_KEY);
+      request.onsuccess = () => {
+        SongsFileHandle = request.result || null;
+        db.close();
+        resolve(SongsFileHandle);
+      };
+      request.onerror = () => { db.close(); resolve(null); };
+    } catch(e) {
+      resolve(null);
+    }
+  });
+}
+
+function songFileSetHandle(handle) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const { db, tx, store } = await songFileOpenStore('readwrite');
+      store.put(handle, SONGS_FILE_KEY);
+      tx.oncomplete = () => { db.close(); resolve(); };
+      tx.onerror = () => { db.close(); reject(tx.error); };
+    } catch(e) {
+      reject(e);
+    }
+  });
+}
+
+async function songFileCanWrite(handle) {
+  if(!handle) return false;
+  const options = { mode: 'readwrite' };
+  if(await handle.queryPermission(options) === 'granted') return true;
+  return await handle.requestPermission(options) === 'granted';
+}
+
+async function songFileWrite(handle, arr = DB) {
+  if(!await songFileCanWrite(handle)) throw new Error('No permission to write songs JSON file.');
+  const writable = await handle.createWritable();
+  await writable.write(dbJsonText(arr));
+  await writable.close();
+}
+
+async function songFileRead(handle) {
+  const file = await handle.getFile();
+  const text = await file.text();
+  if(!text.trim()) return [];
+  const parsed = JSON.parse(text);
+  if(!Array.isArray(parsed)) throw new Error('Songs JSON must contain an array.');
+  return parsed.map(normalizeSong);
+}
+
+async function songFileChoose() {
+  if(!songFileApiSupported()) {
+    showToast('Your browser cannot auto-save JSON files. Use Export JSON instead.');
+    return null;
+  }
+  const handle = await window.showSaveFilePicker({
+    suggestedName: SONGS_FILE_NAME,
+    types: [{
+      description: 'Songs JSON',
+      accept: { 'application/json': ['.json'] }
+    }]
+  });
+  SongsFileHandle = handle;
+  await songFileSetHandle(handle);
+  return handle;
+}
+
+async function dbConnectJsonFile() {
+  try {
+    const handle = await songFileChoose();
+    if(!handle) return false;
+    await songFileWrite(handle, DB);
+    showToast(`Connected ${handle.name || SONGS_FILE_NAME}`);
+    return true;
+  } catch(e) {
+    if(e?.name !== 'AbortError') showToast('Could not connect JSON file.');
+    return false;
+  }
+}
+
+async function dbLoadFromJsonFile() {
+  try {
+    const handle = await songFileGetHandle();
+    if(!handle) return false;
+    if(await handle.queryPermission({ mode: 'read' }) !== 'granted') return false;
+    DB = await songFileRead(handle);
+    dbSaveLocal(DB);
+    return true;
+  } catch(e) {
+    return false;
+  }
+}
+
+async function dbPersistSongs(arr, options = {}) {
+  const songs = arr.map(normalizeSong);
+  dbSaveLocal(songs);
+
+  try {
+    let handle = SongsFileHandle;
+    if(!handle && options.promptForFile !== false) handle = await songFileChoose();
+    if(handle) {
+      await songFileWrite(handle, songs);
+      return true;
+    }
+  } catch(e) {
+    if(e?.name !== 'AbortError') showToast('Saved in browser, but JSON file was not updated.');
+  }
+  return false;
+}
 
 function songTitle(song, lang = song.mainLang) {
   const normalized = normalizeSong(song);

@@ -18,21 +18,17 @@ function openSlideshow(id, startIndex, e) {
   const el = document.getElementById('slideshow');
   if(el.requestFullscreen) el.requestFullscreen().catch(()=>{});
   else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-  // Open projection window
-  projOpen();
 }
 
 function ssClose() {
   if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
   document.getElementById('slideshow').classList.remove('active');
   document.body.style.overflow = '';
-  projClose();
 }
 
 function ssAdv()         { ssStep(1); }
 function ssStep(dir, e)  { if(e) e.stopPropagation(); ssGo(SS.index+dir); }
 function ssGo(i)         { SS.index=Math.max(0,Math.min(SS.slides.length-1,i)); ssRenderAll(); }
-function ssOpenProjectionView(e) { if(e) e.stopPropagation(); projOpen(); }
 
 function ssSwitchLang(lang) {
   const langs = songLangs(SS.song);
@@ -48,11 +44,6 @@ function ssRenderAll() {
   const el = document.getElementById('ssText');
   el.textContent = SS.slides[SS.index] || '';
   el.className   = 'ss-slide-text' + (SS.lang==='arabic'?' arabic':'');
-
-  const nextEl = document.getElementById('ssNextText');
-  const nextText = SS.slides[SS.index + 1] || '';
-  nextEl.textContent = nextText || 'End of song';
-  nextEl.className = 'ss-next-text' + (SS.lang==='arabic'?' arabic':'') + (nextText ? '' : ' ss-next-empty');
 
   const label = document.getElementById('ssSectionLabel');
   label.textContent = slideSectionLabel(SS.song, SS.index);
@@ -73,28 +64,7 @@ function ssRenderAll() {
 
   // Progress
   document.getElementById('ssProgress').textContent = `${SS.index+1} / ${SS.slides.length}`;
-  ssUpdateProjectionStatus();
-
-  // Tray
-  ssBuildTray();
 
   // Push to projection
   if(Proj.active && Proj.win && !Proj.win.closed) projPush();
-}
-
-function ssBuildTray() {
-  document.getElementById('ssTray').innerHTML = SS.slides.map((slide,i)=>`
-    <div class="ss-tray__item${i===SS.index?' active':''}" onclick="ssGo(${i})">
-      <span class="ss-tray__num">${SS.song.showLabels ? slideSectionLabel(SS.song, i) : 'Slide'} ${i+1}</span>${escHtml(slide)}
-    </div>`).join('');
-  // Scroll active item into view
-  const tray = document.getElementById('ssTray');
-  const active = tray.querySelector('.ss-tray__item.active');
-  if(active) active.scrollIntoView({inline:'nearest', behavior:'smooth'});
-}
-
-function ssUpdateProjectionStatus() {
-  const el = document.getElementById('ssProjStatus');
-  if(!el) return;
-  el.textContent = Proj.active && Proj.win && !Proj.win.closed ? 'Slideshow view open' : 'Presenter only';
 }

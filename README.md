@@ -1,6 +1,6 @@
 ﻿# Worship App
 
-A browser-based worship lyrics library and presenter view. This version is split from the original single-file HTML into conventional website/app folders so HTML, CSS, and JavaScript can be maintained by multiple developers.
+A browser-based worship lyrics library and fullscreen slideshow view. This version is split from the original single-file HTML into conventional website/app folders so HTML, CSS, and JavaScript can be maintained by multiple developers.
 
 ## Structure
 
@@ -32,6 +32,10 @@ Open `index.html` in a browser. No build step is required.
 
 Use `Ctrl + Shift + D` in the app to open the dev panel. Songs are saved to browser `localStorage` under the key `worship_songs_v1`.
 
+To keep a real JSON file updated, open the Manage Songs tab and click `Connect JSON`. Choose or create `worship-songs.json`. After that, every song add, edit, or delete writes the full library back to that JSON file automatically.
+
+Browsers require this one-time file permission before a website can write to a local file. If the browser does not support the File System Access API, use `Export JSON` as the fallback.
+
 For starter data committed with the app, edit `src/js/data.js` and add song objects to `DEFAULT_SONGS`. The object shape should match the JSON exported from the dev panel.
 
 ## Developer notes
@@ -40,6 +44,6 @@ For starter data committed with the app, edit `src/js/data.js` and add song obje
 - `render.js` owns DOM rendering and the song management panel.
 - `search.js` contains pure matching helpers.
 - `projection.js` owns the second-screen popup and screen detection helpers.
-- `slideshow.js` owns the presenter overlay state and navigation.
+- `slideshow.js` owns the slideshow overlay state and navigation.
 - `transliterator.js` is reserved for future Arabic-to-Arabizi conversion and is intentionally not loaded by `index.html` yet.
 

@@ -28,11 +28,10 @@
   .site-header__title { font-size: 1.7rem; }
   .song-card__arabizi  { font-size: 15px; }
   .badge               { display: none; }
-  .ss-presenter        { grid-template-columns: 1fr; overflow-y: auto; }
-  .ss-pane--next       { min-height: 180px; }
-  .ss-slide-text       { font-size: clamp(1.3rem, 5vw, 2rem); }
+  .ss-view             { overflow-y: auto; }
+  .ss-stage            { padding: 3rem 1.5rem; }
+  .ss-slide-text       { font-size: clamp(1.8rem, 10vw, 3.4rem); }
   .dev-grid-2, .dev-grid-3 { grid-template-columns: 1fr; }
   .slide-entry__grid   { grid-template-columns: 1fr; }
-  .ss-tray__item       { width: 88px; min-height: 54px; font-size: 10px; }
   .present-bar         { gap: 6px; }
 }
