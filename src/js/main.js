@@ -13,6 +13,16 @@ function handleGlobalKeydown(e) {
     return;
   }
 
+  if(e.key === 'Escape' && document.getElementById('appearancePanel')?.classList.contains('active')) {
+    appearanceClose();
+    return;
+  }
+
+  if(e.key === 'Escape' && document.getElementById('lyricsLangPrompt')?.classList.contains('active')) {
+    cancelLyricsPromptLang();
+    return;
+  }
+
   if(e.key === 'Escape' && document.getElementById('devPanel').classList.contains('active')) {
     devClose();
     return;
@@ -57,19 +67,45 @@ function wireSlideshowControls() {
   document.getElementById('ssNextBtn')?.addEventListener('click', e => ssStep(1, e));
 }
 
+function handleDevSaveClick() {
+  try {
+    const result = devSaveSong();
+    if(result?.catch) {
+      result.catch(err => {
+        console.error(err);
+        showToast('Could not save song.');
+      });
+    }
+  } catch(err) {
+    console.error(err);
+    showToast('Could not save song.');
+  }
+}
+
 function wireDevPanelControls() {
   document.querySelector('.dev-modal__close')?.addEventListener('click', devClose);
   document.getElementById('devTabAdd')?.addEventListener('click', () => devSwitchTab('add'));
   document.getElementById('devTabManage')?.addEventListener('click', () => devSwitchTab('manage'));
-  document.getElementById('devSaveTop')?.addEventListener('click', devSaveSong);
-  document.getElementById('devSaveFooter')?.addEventListener('click', devSaveSong);
+  document.getElementById('devSaveTop')?.addEventListener('click', handleDevSaveClick);
+  document.getElementById('devSaveFooter')?.addEventListener('click', handleDevSaveClick);
   document.getElementById('devResetBtn')?.addEventListener('click', devResetForm);
   document.getElementById('devJsonFileBtn')?.addEventListener('click', devConnectJsonFile);
   document.getElementById('devExportBtn')?.addEventListener('click', devExport);
   document.getElementById('devAddSlideBtn')?.addEventListener('click', () => devAddSlide());
-  document.getElementById('fMainLang')?.addEventListener('change', devSyncLanguageOptions);
+  if(typeof pptxChooseFile === 'function' && typeof handlePptxImport === 'function') {
+    document.getElementById('btnImportPptx')?.addEventListener('click', pptxChooseFile);
+    document.getElementById('pptxFileInput')?.addEventListener('change', handlePptxImport);
+  } else {
+    document.querySelector('.pptx-import')?.classList.add('is-hidden');
+  }
+  document.getElementById('fMainLang')?.addEventListener('change', () => {
+    devSyncLanguageOptions();
+    switchSmartLangTo(document.getElementById('fMainLang').value);
+  });
   document.getElementById('fHasArabizi')?.addEventListener('change', devSyncLanguageOptions);
   document.getElementById('btnParse')?.addEventListener('click', runSmartParse);
+  document.getElementById('lyricsLangPromptConfirm')?.addEventListener('click', confirmLyricsPromptLang);
+  document.getElementById('lyricsLangPromptCancel')?.addEventListener('click', cancelLyricsPromptLang);
 
   document.getElementById('smartLangTabs')?.addEventListener('click', e => {
     const tab = e.target.closest('[data-smart-lang]');
@@ -79,6 +115,7 @@ function wireDevPanelControls() {
 }
 
 async function initApp() {
+  wireAppearanceControls();
   wireSearchControls();
   wireSlideshowControls();
   wireDevPanelControls();

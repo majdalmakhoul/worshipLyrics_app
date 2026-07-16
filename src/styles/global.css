@@ -16,17 +16,162 @@
   --red:         #c0392b;
   --amber-pale:  #fdf3e3;
   --amber-dark:  #9a6a1a;
+  --projection-bg: #1a2e40;
+  --projection-text: #ffffff;
+  --projection-muted: rgba(255,255,255,.62);
+
+  --font-body:   'DM Sans', sans-serif;
+  --font-display:'Cormorant Garamond', serif;
+  --font-lyrics: 'Cormorant Garamond', serif;
+  --font-arabic: 'Cormorant Garamond', serif;
+
+  --container-max: 720px;
+  --header-pad-y: 2rem;
+  --page-pad-y: 1.5rem;
+  --page-pad-x: 1rem;
+  --section-gap: 1.5rem;
+  --card-pad-y: 1rem;
+  --card-pad-x: 1.25rem;
+  --control-pad-y: .85rem;
+  --control-pad-x: 1.15rem;
+  --item-gap: 10px;
+  --lyrics-line: 2.1;
 
   --radius-sm:   8px;
-  --radius-md:   10px;
-  --radius-lg:   14px;
+  --radius-md:   8px;
+  --radius-lg:   8px;
   --radius-pill: 30px;
 
   --shadow-sm: 0 1px 4px rgba(0,0,0,.06);
   --shadow-md: 0 4px 16px rgba(0,0,0,.09);
   --shadow-lg: 0 12px 40px rgba(0,0,0,.14);
+  --surface-border: 1.5px;
 
   --transition: .16s ease;
+}
+
+:root[data-theme="garden"] {
+  --teal:        #66a182;
+  --teal-light:  #b8dcc8;
+  --teal-pale:   #edf8f1;
+  --teal-dark:   #3f7b5f;
+  --navy:        #44346b;
+  --navy-mid:    #604d88;
+  --white:       #ffffff;
+  --off-white:   #fbfcf6;
+  --black:       #17221d;
+  --gray:        #66736b;
+  --gray-light:  #dce8df;
+  --amber-pale:  #fff1d7;
+  --amber-dark:  #91620d;
+  --projection-bg: #44346b;
+  --projection-text: #ffffff;
+}
+
+:root[data-theme="rosewood"] {
+  --teal:        #b45f76;
+  --teal-light:  #e4b7c4;
+  --teal-pale:   #fff0f4;
+  --teal-dark:   #8d3f55;
+  --navy:        #28545a;
+  --navy-mid:    #3f747a;
+  --white:       #ffffff;
+  --off-white:   #fbf8fa;
+  --black:       #21181b;
+  --gray:        #78686d;
+  --gray-light:  #eadde1;
+  --amber-pale:  #fff3d8;
+  --amber-dark:  #8a6411;
+  --projection-bg: #28545a;
+  --projection-text: #ffffff;
+}
+
+:root[data-theme="night"] {
+  --teal:        #d7c66f;
+  --teal-light:  #70683e;
+  --teal-pale:   #272519;
+  --teal-dark:   #eadb89;
+  --navy:        #11120f;
+  --navy-mid:    #2f3329;
+  --white:       #191a17;
+  --off-white:   #10110f;
+  --black:       #f7f1d7;
+  --gray:        #c8c1a6;
+  --gray-light:  #3d3b31;
+  --red:         #ff8d7f;
+  --amber-pale:  #332b16;
+  --amber-dark:  #f3d072;
+  --projection-bg: #11120f;
+  --projection-text: #f7f1d7;
+  --projection-muted: rgba(247,241,215,.62);
+  --shadow-sm: 0 1px 8px rgba(0,0,0,.28);
+  --shadow-md: 0 6px 20px rgba(0,0,0,.32);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,.45);
+}
+
+:root[data-font="modern"] {
+  --font-body:   'Segoe UI', Arial, sans-serif;
+  --font-display:'Segoe UI', Arial, sans-serif;
+  --font-lyrics: 'Segoe UI', Arial, sans-serif;
+  --font-arabic: Tahoma, Arial, sans-serif;
+}
+
+:root[data-font="readable"] {
+  --font-body:   Verdana, Geneva, sans-serif;
+  --font-display:Verdana, Geneva, sans-serif;
+  --font-lyrics: Verdana, Geneva, sans-serif;
+  --font-arabic: Tahoma, Arial, sans-serif;
+}
+
+:root[data-font="serif"] {
+  --font-body:   Georgia, 'Times New Roman', serif;
+  --font-display:Georgia, 'Times New Roman', serif;
+  --font-lyrics: Georgia, 'Times New Roman', serif;
+  --font-arabic: Georgia, 'Times New Roman', serif;
+}
+
+:root[data-density="compact"] {
+  --container-max: 680px;
+  --header-pad-y: 1.35rem;
+  --page-pad-y: 1rem;
+  --section-gap: 1rem;
+  --card-pad-y: .75rem;
+  --card-pad-x: .9rem;
+  --control-pad-y: .65rem;
+  --control-pad-x: .9rem;
+  --item-gap: 7px;
+  --lyrics-line: 1.85;
+}
+
+:root[data-density="large"] {
+  --container-max: 780px;
+  --header-pad-y: 2.35rem;
+  --page-pad-y: 1.8rem;
+  --section-gap: 1.9rem;
+  --card-pad-y: 1.15rem;
+  --card-pad-x: 1.4rem;
+  --control-pad-y: 1rem;
+  --control-pad-x: 1.35rem;
+  --item-gap: 13px;
+  --lyrics-line: 2.25;
+}
+
+:root[data-design="outlined"] {
+  --surface-border: 2px;
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: 0 8px 24px rgba(0,0,0,.12);
+}
+
+:root[data-design="plain"] {
+  --surface-border: 1px;
+  --radius-sm: 4px;
+  --radius-md: 4px;
+  --radius-lg: 4px;
+  --radius-pill: 4px;
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
 }
 
 /* =============================================
@@ -35,11 +180,11 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--font-body);
   background: var(--off-white);
   color: var(--black);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
-button { font-family: 'DM Sans', sans-serif; cursor: pointer; }
-input, textarea, select { font-family: 'DM Sans', sans-serif; }
+button { font-family: var(--font-body); cursor: pointer; }
+input, textarea, select { font-family: var(--font-body); }

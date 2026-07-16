@@ -273,8 +273,11 @@ function chooseScreen(index, songId, e) {
    SMART LYRICS PARSER
 ================================================================ */
 let smartActiveLang = 'arabizi';
+let lyricsLangPromptResolve = null;
+let lyricsLangPromptSelected = null;
 
 function switchSmartLang(lang, tabEl) {
+  if(!LANG_ORDER.includes(lang)) return;
   smartActiveLang = lang;
   document.querySelectorAll('.smart-lang-tab').forEach(t=>t.classList.remove('active'));
   tabEl.classList.add('active');
@@ -283,47 +286,115 @@ function switchSmartLang(lang, tabEl) {
   document.getElementById(map[lang]).style.display='block';
 }
 
+function switchSmartLangTo(lang) {
+  const tab = document.querySelector(`[data-smart-lang="${lang}"]`);
+  if(tab) switchSmartLang(lang, tab);
+  else if(LANG_ORDER.includes(lang)) smartActiveLang = lang;
+}
+
+function smartRawId(lang) {
+  return ({ arabizi:'rawArabizi', arabic:'rawArabic', en:'rawEn', fr:'rawFr' })[lang];
+}
+
+function currentFormMainLang() {
+  return document.getElementById('fMainLang')?.value || 'arabic';
+}
+
+function preferredLyricsLang() {
+  return LANG_ORDER.includes(currentFormMainLang()) ? currentFormMainLang() : smartActiveLang;
+}
+
+function askLyricsTargetLang(actionLabel) {
+  const prompt = document.getElementById('lyricsLangPrompt');
+  if(!prompt) return Promise.resolve(preferredLyricsLang());
+
+  lyricsLangPromptSelected = preferredLyricsLang();
+  document.getElementById('lyricsLangPromptTitle').textContent = `${actionLabel}: choose lyrics language`;
+  renderLyricsLangPromptOptions();
+  prompt.classList.add('active');
+
+  return new Promise(resolve => {
+    lyricsLangPromptResolve = resolve;
+  });
+}
+
+function renderLyricsLangPromptOptions() {
+  const options = document.getElementById('lyricsLangPromptOptions');
+  options.innerHTML = LANG_ORDER.map(lang => `
+    <button class="lang-prompt__option${lyricsLangPromptSelected===lang?' active':''}"
+            type="button"
+            onclick="chooseLyricsPromptLang('${lang}')">${LANG_LABELS[lang]}</button>
+  `).join('');
+}
+
+function chooseLyricsPromptLang(lang) {
+  if(!LANG_ORDER.includes(lang)) return;
+  lyricsLangPromptSelected = lang;
+  renderLyricsLangPromptOptions();
+}
+
+function closeLyricsLangPrompt(lang) {
+  document.getElementById('lyricsLangPrompt')?.classList.remove('active');
+  const resolve = lyricsLangPromptResolve;
+  lyricsLangPromptResolve = null;
+  if(lang) switchSmartLangTo(lang);
+  if(resolve) resolve(lang || null);
+}
+
+function confirmLyricsPromptLang() {
+  closeLyricsLangPrompt(lyricsLangPromptSelected || preferredLyricsLang());
+}
+
+function cancelLyricsPromptLang() {
+  closeLyricsLangPrompt(null);
+}
+
+function devCanReplaceSlidesBuilder() {
+  const entries = Array.from(document.querySelectorAll('.slide-entry'));
+  if(entries.length === 0) return true;
+  return entries.every(entry => LANG_ORDER.every(lang => {
+    const field = entry.querySelector(`[data-field="${lang}"]`);
+    return !field || !field.value.trim();
+  }));
+}
+
+function devPopulateSlidesForLang(slides, lang) {
+  document.getElementById('slidesBuilder').innerHTML = '';
+  devSlideCount = 0;
+
+  for(const slide of slides) {
+    const data = { arabizi:'', arabic:'', en:'', fr:'', section:'verse' };
+    data[lang] = slide;
+    devAddSlide(data);
+  }
+}
+
 async function runSmartParse() {
   const btn = document.getElementById('btnParse');
   try {
-    // Gather all non-empty raw inputs
-    const inputs = {
-      arabizi: document.getElementById('rawArabizi').value.trim(),
-      arabic:  document.getElementById('rawArabic').value.trim(),
-      en:      document.getElementById('rawEn').value.trim(),
-      fr:      document.getElementById('rawFr').value.trim(),
-    };
+    const lang = await askLyricsTargetLang('Auto-split lyrics');
+    if(!lang) return;
 
-    const hasAny = Object.values(inputs).some(v=>v);
-    if(!hasAny) { showToast('Paste at least one language of lyrics first.'); return; }
+    const rawInput = document.getElementById(smartRawId(lang));
+    const text = rawInput?.value.trim() || '';
+
+    if(!text) {
+      showToast(`Paste ${LANG_LABELS[lang]} lyrics first.`);
+      return;
+    }
 
     btn.disabled = true;
 
-    // Parse each language and collect results
-    const results = {};
-    for(const [lang, text] of Object.entries(inputs)) {
-      if(!text) continue;
-      results[lang] = await parseLyricsForLang(text, lang);
+    const slides = await parseLyricsForLang(text, lang);
+    if(slides.length === 0) { showToast('Could not split lyrics. Try pasting more text.'); return; }
+
+    if(!devCanReplaceSlidesBuilder()) {
+      const ok = confirm(`Replace current slide builder with ${slides.length} ${LANG_LABELS[lang]} slide${slides.length === 1 ? '' : 's'}?`);
+      if(!ok) return;
     }
 
-    // If we got slides from at least one language, merge into slide builder
-    const maxSlides = Math.max(...Object.values(results).map(r=>r.length), 0);
-    if(maxSlides === 0) { showToast('Could not split lyrics. Try pasting more text.'); return; }
-
-    // Rebuild slide builder using result alignment
-    document.getElementById('slidesBuilder').innerHTML = '';
-    devSlideCount = 0;
-
-    for(let i=0;i<maxSlides;i++) {
-      devAddSlide({
-        arabizi: results.arabizi?.[i] || '',
-        arabic:  results.arabic?.[i]  || '',
-        en:      results.en?.[i]      || '',
-        fr:      results.fr?.[i]      || '',
-      });
-    }
-
-    showToast(`Split into ${maxSlides} slides`);
+    devPopulateSlidesForLang(slides, lang);
+    showToast(`Split ${slides.length} ${LANG_LABELS[lang]} slide${slides.length === 1 ? '' : 's'}`);
   } finally {
     btn.disabled = false;
   }
@@ -439,6 +510,7 @@ function devResetForm() {
   ['rawArabizi','rawArabic','rawEn','rawFr'].forEach(id=>document.getElementById(id).value='');
   devAddSlide(); devAddSlide(); // 2 blank slides to start
   devSyncLanguageOptions();
+  switchSmartLangTo(currentFormMainLang());
 }
 
 function devLoadSong(song) {
@@ -465,6 +537,7 @@ function devLoadSong(song) {
   document.getElementById('devTitle').textContent   = 'Edit Song';
   document.getElementById('devEditNote').textContent = `Editing: ${songTitle(song)}`;
   devSyncLanguageOptions();
+  switchSmartLangTo(currentFormMainLang());
   devSwitchTab('add');
 }
 

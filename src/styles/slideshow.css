@@ -3,7 +3,7 @@
 ============================================= */
 #slideshow {
   display: none; position: fixed; inset: 0;
-  z-index: 1000; background: var(--navy);
+  z-index: 1000; background: var(--projection-bg);
   flex-direction: column;
 }
 #slideshow.active { display: flex; }
@@ -15,7 +15,7 @@
   display: flex; align-items: center; gap: 10px;
   flex-shrink: 0; flex-wrap: wrap;
 }
-.ss-bar__title { font-family: 'Cormorant Garamond', serif; font-size: 15px; color: rgba(255,255,255,.75); font-style: italic; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ss-bar__title { font-family: var(--font-display); font-size: 15px; color: rgba(255,255,255,.75); font-style: italic; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ss-bar__langs { display: flex; gap: 5px; flex-wrap: wrap; flex-shrink: 0; }
 .ss-lang-tab {
   font-size: 11px; padding: 4px 10px; border-radius: var(--radius-pill);
@@ -61,13 +61,13 @@
 }
 .ss-section-label.visible { display: block; }
 .ss-slide-text {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: var(--font-lyrics);
   font-size: clamp(2.2rem, 5.5vw, 5rem);
-  color: #fff; text-align: center;
+  color: var(--projection-text); text-align: center;
   line-height: 1.7; white-space: pre-line;
   max-width: 88vw; animation: ssIn .28s ease;
 }
-.ss-slide-text.arabic { direction: rtl; font-size: clamp(2.4rem, 6vw, 5.4rem); }
+.ss-slide-text.arabic { direction: rtl; font-family: var(--font-arabic); font-size: clamp(2.4rem, 6vw, 5.4rem); }
 @keyframes ssIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
 /* Bottom nav */
@@ -91,4 +91,19 @@
   white-space: nowrap; flex-shrink: 0;
 }
 .ss-hint { font-size: 11px; color: rgba(255,255,255,.25); letter-spacing: .04em; white-space: nowrap; }
+
+@media (max-width: 820px) {
+  .ss-bar { gap: 8px; }
+  .ss-bar__title { flex-basis: 100%; }
+  .ss-footer { justify-content: center; }
+  .ss-hint { display: none; }
+}
+
+@media (max-width: 520px) {
+  .ss-bar,
+  .ss-footer { padding: .55rem .75rem; }
+  .ss-lang-tab { padding: 5px 8px; }
+  .ss-nav { flex: 1 1 110px; justify-content: center; padding: 7px 10px; }
+  .ss-progress { order: -1; width: 100%; text-align: center; }
+}
 

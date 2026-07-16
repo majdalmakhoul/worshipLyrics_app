@@ -109,16 +109,26 @@ function projPush() {
   }, '*');
 }
 
+function projCssVar(name, fallback) {
+  const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return (value || fallback).replace(/[<>]/g, '');
+}
+
 function projHTML() {
+  const bg = projCssVar('--projection-bg', '#1a2e40');
+  const text = projCssVar('--projection-text', '#ffffff');
+  const muted = projCssVar('--projection-muted', 'rgba(255,255,255,.62)');
+  const lyricFont = projCssVar('--font-lyrics', "'Cormorant Garamond', serif");
+  const arabicFont = projCssVar('--font-arabic', "'Cormorant Garamond', serif");
   return `<!DOCTYPE html><html><head><meta charset="UTF-8">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
-  html,body{width:100%;height:100%;background:#1a2e40;display:flex;flex-direction:column;gap:2rem;align-items:center;justify-content:center;overflow:hidden;cursor:none}
-  #label{display:none;font-family:Arial,sans-serif;font-size:clamp(.9rem,1.6vw,1.4rem);font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.58)}
+  html,body{width:100%;height:100%;background:${bg};display:flex;flex-direction:column;gap:2rem;align-items:center;justify-content:center;overflow:hidden;cursor:none}
+  #label{display:none;font-family:Arial,sans-serif;font-size:clamp(.9rem,1.6vw,1.4rem);font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:${muted}}
   #label.visible{display:block}
-  #s{font-family:'Cormorant Garamond',serif;font-size:clamp(2.2rem,5.5vw,5rem);color:#fff;text-align:center;line-height:1.75;white-space:pre-line;max-width:88%;padding:2rem;transition:opacity .2s ease}
-  #s.rtl{direction:rtl}
+  #s{font-family:${lyricFont};font-size:clamp(2.2rem,5.5vw,5rem);color:${text};text-align:center;line-height:1.75;white-space:pre-line;max-width:88%;padding:2rem;transition:opacity .2s ease}
+  #s.rtl{direction:rtl;font-family:${arabicFont}}
 </style></head><body>
 <div id="label"></div>
 <div id="s">&#9834;</div>

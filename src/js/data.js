@@ -41,7 +41,7 @@ function dbLoad() {
   }
 }
 function dbSaveLocal(arr)  { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
-function dbSave(arr) { return dbPersistSongs(arr); }
+function dbSave(arr) { return dbPersistSongs(arr, { promptForFile:false }); }
 
 let DB = dbLoad();  // master song array
 
