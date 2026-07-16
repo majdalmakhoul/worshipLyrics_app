@@ -3,7 +3,7 @@
 ============================================= */
 .site-header {
   background: var(--teal);
-  padding: var(--header-pad-y) 1.5rem 1.75rem;
+  padding: calc(var(--header-pad-y) + env(safe-area-inset-top)) 1.5rem 1.75rem;
   text-align: center;
 }
 .site-header::after {
@@ -22,9 +22,13 @@
   position: relative;
 }
 .site-header__ornament { font-size: 18px; color: #fff; opacity: .8; letter-spacing: .15em; margin-bottom: .4rem; }
-.site-header__customize {
+.site-header__actions {
   position: absolute; right: 0; top: 50%;
   transform: translateY(-50%);
+  display: flex; align-items: center; gap: 8px;
+}
+.site-header__customize,
+.site-header__install {
   display: flex; align-items: center; gap: 6px;
   padding: 7px 12px;
   border: 1px solid rgba(255,255,255,.55);
@@ -33,13 +37,14 @@
   font-size: 12px; font-weight: 500;
   transition: background var(--transition), border-color var(--transition);
 }
-.site-header__customize:hover { background: rgba(255,255,255,.2); border-color: #fff; }
+.site-header__customize:hover,
+.site-header__install:hover { background: rgba(255,255,255,.2); border-color: #fff; }
 .site-header__title    { font-family: var(--font-display); font-size: 2.2rem; font-weight: 600; color: #fff; }
 .site-header__sub      { font-size: 12px; color: #fff; opacity: .75; margin-top: .4rem; letter-spacing: .08em; text-transform: uppercase; }
 
 .container { max-width: var(--container-max); margin: 0 auto; padding: var(--page-pad-y) var(--page-pad-x) 4rem; }
 
-.site-footer { text-align: center; font-size: 11px; color: var(--gray); padding: 2rem 1rem 1rem; letter-spacing: .06em; text-transform: uppercase; opacity: .7; }
+.site-footer { text-align: center; font-size: 11px; color: var(--gray); padding: 2rem 1rem calc(1rem + env(safe-area-inset-bottom)); letter-spacing: .06em; text-transform: uppercase; opacity: .7; }
 
 /* =============================================
    RESPONSIVE
@@ -68,11 +73,17 @@
     flex-direction: column;
     gap: .55rem;
   }
-  .site-header__customize {
+  .site-header__actions {
     position: static;
     transform: none;
     width: 100%;
-    max-width: 190px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .site-header__customize,
+  .site-header__install {
+    flex: 1 1 130px;
+    max-width: 180px;
     justify-content: center;
   }
   .site-header__title { font-size: 1.7rem; }

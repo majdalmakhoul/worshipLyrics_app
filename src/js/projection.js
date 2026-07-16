@@ -105,7 +105,8 @@ function projPush() {
     type:'slide',
     text:SS.slides[SS.index],
     rtl:SS.lang==='arabic',
-    label:SS.song.showLabels ? slideSectionLabel(SS.song, SS.index) : ''
+    label:SS.song.showLabels ? slideSectionLabel(SS.song, SS.index) : '',
+    scale:typeof appearanceLyricsScale === 'function' ? appearanceLyricsScale() : 1
   }, '*');
 }
 
@@ -120,6 +121,7 @@ function projHTML() {
   const muted = projCssVar('--projection-muted', 'rgba(255,255,255,.62)');
   const lyricFont = projCssVar('--font-lyrics', "'Cormorant Garamond', serif");
   const arabicFont = projCssVar('--font-arabic', "'Cormorant Garamond', serif");
+  const lyricScale = Math.min(1.5, Math.max(0.7, Number(projCssVar('--lyrics-size-scale', '1')) || 1));
   return `<!DOCTYPE html><html><head><meta charset="UTF-8">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -127,7 +129,7 @@ function projHTML() {
   html,body{width:100%;height:100%;background:${bg};display:flex;flex-direction:column;gap:2rem;align-items:center;justify-content:center;overflow:hidden;cursor:none}
   #label{display:none;font-family:Arial,sans-serif;font-size:clamp(.9rem,1.6vw,1.4rem);font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:${muted}}
   #label.visible{display:block}
-  #s{font-family:${lyricFont};font-size:clamp(2.2rem,5.5vw,5rem);color:${text};text-align:center;line-height:1.75;white-space:pre-line;max-width:88%;padding:2rem;transition:opacity .2s ease}
+  #s{font-family:${lyricFont};font-size:clamp(2.2rem,5.5vw,5rem);color:${text};text-align:center;line-height:1.75;white-space:pre-line;max-width:88%;overflow-wrap:anywhere;transition:opacity .2s ease}
   #s.rtl{direction:rtl;font-family:${arabicFont}}
 </style></head><body>
 <div id="label"></div>
@@ -135,15 +137,42 @@ function projHTML() {
 <script>
   const el=document.getElementById('s');
   const label=document.getElementById('label');
-  window.addEventListener('load',()=>{ try{document.documentElement.requestFullscreen();}catch(e){} });
+  let lyricScale=${lyricScale};
+  function fitSlide(){
+    const labelVisible=label.classList.contains('visible');
+    const labelHeight=labelVisible?label.getBoundingClientRect().height+Math.max(12,window.innerHeight*.025):0;
+    const marginX=Math.max(32,Math.min(120,window.innerWidth*.08));
+    const marginY=Math.max(28,Math.min(96,window.innerHeight*.08));
+    const maxWidth=Math.max(220,window.innerWidth-(marginX*2));
+    const maxHeight=Math.max(120,window.innerHeight-(marginY*2)-labelHeight);
+    const languageMax=el.classList.contains('rtl')?86:80;
+    const preferred=Math.max(18,Math.min(languageMax*lyricScale,window.innerWidth*.13*lyricScale,window.innerHeight*.16*lyricScale));
+    const minSize=Math.max(14,Math.min(26,Math.min(window.innerWidth,window.innerHeight)*.04));
+    el.style.maxWidth=maxWidth+'px';
+    el.style.fontSize=preferred+'px';
+    let low=minSize;
+    let high=Math.max(minSize,preferred);
+    let best=minSize;
+    for(let i=0;i<12;i++){
+      const mid=(low+high)/2;
+      el.style.fontSize=mid+'px';
+      const fits=el.scrollWidth<=maxWidth+1&&el.scrollHeight<=maxHeight+1;
+      if(fits){best=mid;low=mid;}else{high=mid;}
+    }
+    el.style.fontSize=Math.floor(best)+'px';
+  }
+  window.addEventListener('load',()=>{ try{document.documentElement.requestFullscreen();}catch(e){} fitSlide(); });
+  window.addEventListener('resize',fitSlide);
   window.addEventListener('message',e=>{
     if(!e.data||e.data.type!=='slide')return;
     el.style.opacity='0';
     setTimeout(()=>{
+      lyricScale=Number(e.data.scale)||lyricScale;
       label.textContent=e.data.label||'';
       label.classList.toggle('visible',!!e.data.label);
       el.textContent=e.data.text;
       el.classList.toggle('rtl',!!e.data.rtl);
+      fitSlide();
       el.style.opacity='1';
     },180);
   });

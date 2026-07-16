@@ -6,6 +6,7 @@ const SONGS_FILE_DB = 'worship_song_file_store';
 const SONGS_FILE_STORE = 'handles';
 const SONGS_FILE_KEY = 'songs-json';
 const SONGS_FILE_NAME = 'worship-songs.json';
+const SONGS_API_URL = './api/songs';
 const SONGS_PER_PAGE = 10;
 const LANG_LABELS   = { arabizi:'Arabizi', arabic:'عربي', en:'English', fr:'Français' };
 const LANG_FILTER_LABELS = {
@@ -27,6 +28,7 @@ const DEFAULT_SONGS = [
 ];
 
 let SongsFileHandle = null;
+let SharedSongsApiAvailable = false;
 
 function cloneDefaultSongs() {
   return JSON.parse(JSON.stringify(DEFAULT_SONGS));
@@ -70,6 +72,53 @@ dbSaveLocal(DB);
 
 function dbJsonText(arr = DB) {
   return `${JSON.stringify(arr.map(normalizeSong), null, 2)}\n`;
+}
+
+function sharedSongsApiSupported() {
+  return location.protocol !== 'file:' && 'fetch' in window;
+}
+
+async function sharedSongsRead() {
+  if(!sharedSongsApiSupported()) return null;
+  const response = await fetch(SONGS_API_URL, {
+    cache: 'no-store',
+    headers: { 'Accept': 'application/json' }
+  });
+  if(!response.ok) throw new Error('Shared song library is unavailable.');
+  const parsed = await response.json();
+  if(!Array.isArray(parsed)) throw new Error('Shared song library must contain an array.');
+  SharedSongsApiAvailable = true;
+  return parsed.map(normalizeSong);
+}
+
+async function sharedSongsWrite(arr) {
+  if(!sharedSongsApiSupported()) return false;
+  if(!SharedSongsApiAvailable) return false;
+
+  const response = await fetch(SONGS_API_URL, {
+    method: 'PUT',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: dbJsonText(arr),
+    cache: 'no-store'
+  });
+  if(!response.ok) throw new Error('Shared song library could not be saved.');
+  return true;
+}
+
+async function dbLoadFromSharedStore() {
+  try {
+    const songs = await sharedSongsRead();
+    if(!songs) return false;
+    DB = songs;
+    dbSaveLocal(DB);
+    return true;
+  } catch(e) {
+    SharedSongsApiAvailable = false;
+    return false;
+  }
 }
 
 function songFileApiSupported() {
@@ -194,6 +243,13 @@ async function dbLoadFromJsonFile() {
 async function dbPersistSongs(arr, options = {}) {
   const songs = arr.map(normalizeSong);
   dbSaveLocal(songs);
+
+  try {
+    if(await sharedSongsWrite(songs)) return true;
+  } catch(e) {
+    showToast('Saved in this browser, but the shared library was not updated.');
+    return false;
+  }
 
   try {
     let handle = SongsFileHandle;

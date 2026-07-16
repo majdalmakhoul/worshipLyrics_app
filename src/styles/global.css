@@ -24,6 +24,10 @@
   --font-display:'Cormorant Garamond', serif;
   --font-lyrics: 'Cormorant Garamond', serif;
   --font-arabic: 'Cormorant Garamond', serif;
+  --lyrics-size-scale: 1;
+  --lyrics-list-size: 15px;
+  --lyrics-list-arabizi-size: 17px;
+  --lyrics-list-arabic-size: 18px;
 
   --container-max: 720px;
   --header-pad-y: 2rem;

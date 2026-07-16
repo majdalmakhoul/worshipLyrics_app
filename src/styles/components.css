@@ -142,11 +142,11 @@
 /* Full lyrics text */
 .lyrics-full { padding: 1.25rem 1.5rem; }
 .lyrics-full__text {
-  font-size: 15px; line-height: var(--lyrics-line);
+  font-size: var(--lyrics-list-size); line-height: var(--lyrics-line);
   color: var(--black); white-space: pre-line;
 }
-.lyrics-full__text.arabizi { font-family: var(--font-lyrics); font-size: 17px; }
-.lyrics-full__text.arabic  { font-family: var(--font-arabic); font-size: 18px; direction: rtl; text-align: right; }
+.lyrics-full__text.arabizi { font-family: var(--font-lyrics); font-size: var(--lyrics-list-arabizi-size); }
+.lyrics-full__text.arabic  { font-family: var(--font-arabic); font-size: var(--lyrics-list-arabic-size); direction: rtl; text-align: right; }
 
 /* Slide chips */
 .slide-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 1.5rem 1rem; }
@@ -494,6 +494,28 @@
   flex-shrink: 0;
 }
 .appearance-choice__label { font-size: 13px; font-weight: 500; }
+.appearance-range {
+  min-height: 52px;
+  border: var(--surface-border) solid var(--gray-light);
+  border-radius: var(--radius-sm);
+  background: var(--off-white);
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.appearance-range input[type="range"] {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--teal-dark);
+}
+.appearance-range output {
+  min-width: 46px;
+  text-align: right;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--teal-dark);
+}
 .appearance-panel__footer {
   padding: .9rem 1.25rem;
   border-top: var(--surface-border) solid var(--gray-light);

@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: worship-lyrics-app
+    runtime: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: SONGS_FILE
+        value: /var/data/worship-songs.json
+    disk:
+      name: song-library
+      mountPath: /var/data
+      sizeGB: 1

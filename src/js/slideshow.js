@@ -1,4 +1,5 @@
-﻿let SS = { song:null, slides:[], index:0, lang:'arabizi' };
+let SS = { song:null, slides:[], index:0, lang:'arabizi' };
+let ssFitFrame = null;
 
 /* ================================================================
    SLIDESHOW
@@ -53,7 +54,7 @@ function ssRenderAll() {
   const suffix = SS.lang !== SS.song.mainLang && SS.song[SS.lang] ? ` - ${SS.song[SS.lang]}` : '';
   document.getElementById('ssTitle').textContent = songTitle(SS.song) + suffix;
 
-  // Lang tabs ? only langs with content
+  // Lang tabs - only langs with content
   const langs = songLangs(SS.song);
   document.getElementById('ssLangTabs').innerHTML = langs.map(l=>`
     <button class="ss-lang-tab${SS.lang===l?' active':''}" onclick="ssSwitchLang('${l}')">${LANG_LABELS[l]}</button>`).join('');
@@ -65,6 +66,62 @@ function ssRenderAll() {
   // Progress
   document.getElementById('ssProgress').textContent = `${SS.index+1} / ${SS.slides.length}`;
 
+  ssScheduleFit();
+
   // Push to projection
   if(Proj.active && Proj.win && !Proj.win.closed) projPush();
+}
+
+function ssScheduleFit() {
+  if(ssFitFrame) cancelAnimationFrame(ssFitFrame);
+  ssFitFrame = requestAnimationFrame(() => {
+    ssFitFrame = null;
+    ssFitText();
+  });
+}
+
+function ssFitText() {
+  const slideshow = document.getElementById('slideshow');
+  const stage = document.getElementById('ssStage');
+  const text = document.getElementById('ssText');
+  if(!slideshow?.classList.contains('active') || !stage || !text) return;
+
+  const stageRect = stage.getBoundingClientRect();
+  if(stageRect.width < 1 || stageRect.height < 1) return;
+
+  const label = document.getElementById('ssSectionLabel');
+  const labelHeight = label?.classList.contains('visible') ? label.getBoundingClientRect().height + Math.max(12, stageRect.height * 0.025) : 0;
+  const marginX = Math.max(28, Math.min(110, stageRect.width * 0.08));
+  const marginY = Math.max(24, Math.min(90, stageRect.height * 0.08));
+  const maxWidth = Math.max(220, stageRect.width - (marginX * 2));
+  const maxHeight = Math.max(120, stageRect.height - (marginY * 2) - labelHeight);
+  const scale = typeof appearanceLyricsScale === 'function' ? appearanceLyricsScale() : 1;
+  const languageMax = SS.lang === 'arabic' ? 86 : 80;
+  const preferred = Math.max(18, Math.min(
+    languageMax * scale,
+    stageRect.width * 0.13 * scale,
+    stageRect.height * 0.16 * scale
+  ));
+  const minSize = Math.max(14, Math.min(26, Math.min(stageRect.width, stageRect.height) * 0.04));
+
+  text.style.maxWidth = `${maxWidth}px`;
+  text.style.fontSize = `${preferred}px`;
+
+  let low = minSize;
+  let high = Math.max(minSize, preferred);
+  let best = minSize;
+
+  for(let i = 0; i < 12; i++) {
+    const mid = (low + high) / 2;
+    text.style.fontSize = `${mid}px`;
+    const fits = text.scrollWidth <= maxWidth + 1 && text.scrollHeight <= maxHeight + 1;
+    if(fits) {
+      best = mid;
+      low = mid;
+    } else {
+      high = mid;
+    }
+  }
+
+  text.style.fontSize = `${Math.floor(best)}px`;
 }

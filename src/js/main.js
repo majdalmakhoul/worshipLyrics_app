@@ -39,7 +39,9 @@ function handleFullscreenChange() {
     document.getElementById('slideshow').classList.remove('active');
     document.body.style.overflow = '';
     projClose();
+    return;
   }
+  ssScheduleFit();
 }
 
 function wireSearchControls() {
@@ -65,6 +67,8 @@ function wireSlideshowControls() {
   document.querySelector('.ss-pane--current')?.addEventListener('click', ssAdv);
   document.getElementById('ssPrev')?.addEventListener('click', e => ssStep(-1, e));
   document.getElementById('ssNextBtn')?.addEventListener('click', e => ssStep(1, e));
+  window.addEventListener('resize', ssScheduleFit);
+  window.addEventListener('orientationchange', ssScheduleFit);
 }
 
 function handleDevSaveClick() {
@@ -116,6 +120,7 @@ function wireDevPanelControls() {
 
 async function initApp() {
   wireAppearanceControls();
+  wirePwaControls();
   wireSearchControls();
   wireSlideshowControls();
   wireDevPanelControls();
@@ -123,9 +128,11 @@ async function initApp() {
   document.addEventListener('keydown', handleGlobalKeydown);
   document.addEventListener('fullscreenchange', handleFullscreenChange);
 
-  await dbLoadFromJsonFile();
+  const loadedSharedSongs = await dbLoadFromSharedStore();
+  if(!loadedSharedSongs) await dbLoadFromJsonFile();
   buildLangFilter();
   render();
+  registerServiceWorker();
 }
 
 document.addEventListener('DOMContentLoaded', initApp);
