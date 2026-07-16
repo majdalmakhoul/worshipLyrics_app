@@ -1,0 +1,22 @@
+[
+  {
+    "name": "NODE_ENV",
+    "value": "production",
+    "slotSetting": false
+  },
+  {
+    "name": "SONGS_FILE",
+    "value": "/home/data/worship-songs.json",
+    "slotSetting": false
+  },
+  {
+    "name": "ADMIN_TOKEN",
+    "value": "replace-with-a-long-random-admin-password",
+    "slotSetting": true
+  },
+  {
+    "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+    "value": "true",
+    "slotSetting": false
+  }
+]
