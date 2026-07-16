@@ -6,8 +6,12 @@ services:
     buildCommand: npm install
     startCommand: npm start
     envVars:
+      - key: NODE_ENV
+        value: production
       - key: SONGS_FILE
         value: /var/data/worship-songs.json
+      - key: ADMIN_TOKEN
+        sync: false
     disk:
       name: song-library
       mountPath: /var/data

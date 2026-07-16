@@ -1,4 +1,5 @@
 const http = require('http');
+const crypto = require('crypto');
 const fs = require('fs/promises');
 const path = require('path');
 
@@ -9,6 +10,15 @@ const SONGS_FILE = process.env.SONGS_FILE
   : DEFAULT_SONGS_FILE;
 const PORT = Number(process.env.PORT || 8080);
 const MAX_BODY_BYTES = 5 * 1024 * 1024;
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN || '';
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
+const SECURITY_HEADERS = {
+  'X-Content-Type-Options': 'nosniff',
+  'Referrer-Policy': 'no-referrer',
+  'X-Frame-Options': 'DENY',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=()'
+};
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -24,14 +34,16 @@ const MIME_TYPES = {
 function send(res, status, body, headers = {}) {
   res.writeHead(status, {
     'Cache-Control': 'no-store',
+    ...SECURITY_HEADERS,
     ...headers
   });
   res.end(body);
 }
 
-function sendJson(res, status, value) {
+function sendJson(res, status, value, headers = {}) {
   send(res, status, `${JSON.stringify(value)}\n`, {
-    'Content-Type': 'application/json; charset=utf-8'
+    'Content-Type': 'application/json; charset=utf-8',
+    ...headers
   });
 }
 
@@ -100,6 +112,36 @@ function readRequestBody(req) {
   });
 }
 
+function bearerToken(req) {
+  const header = req.headers.authorization || '';
+  const match = header.match(/^Bearer\s+(.+)$/i);
+  return match ? match[1].trim() : '';
+}
+
+function secureTokenEquals(received, expected) {
+  const receivedBuffer = Buffer.from(String(received));
+  const expectedBuffer = Buffer.from(String(expected));
+  if(receivedBuffer.length !== expectedBuffer.length) return false;
+  return crypto.timingSafeEqual(receivedBuffer, expectedBuffer);
+}
+
+function requireAdminWrite(req, res) {
+  if(!ADMIN_TOKEN) {
+    if(IS_PRODUCTION) {
+      sendJson(res, 503, { error: 'Admin token is not configured.' });
+      return false;
+    }
+    return true;
+  }
+
+  if(secureTokenEquals(bearerToken(req), ADMIN_TOKEN)) return true;
+
+  sendJson(res, 401, { error: 'Admin token required.' }, {
+    'WWW-Authenticate': 'Bearer realm="worship-admin"'
+  });
+  return false;
+}
+
 async function handleSongsApi(req, res) {
   if(req.method === 'GET') {
     sendJson(res, 200, await readSongs());
@@ -107,8 +149,15 @@ async function handleSongsApi(req, res) {
   }
 
   if(req.method === 'PUT' || req.method === 'POST') {
+    if(!requireAdminWrite(req, res)) return;
     const body = await readRequestBody(req);
-    const songs = body.trim() ? JSON.parse(body) : [];
+    let songs;
+    try {
+      songs = body.trim() ? JSON.parse(body) : [];
+    } catch(err) {
+      sendJson(res, 400, { error: 'Invalid songs JSON.' });
+      return;
+    }
     await writeSongs(songs);
     sendJson(res, 200, { ok: true, count: songs.length });
     return;
@@ -137,7 +186,8 @@ async function serveStatic(req, res) {
       : 'public, max-age=3600';
     res.writeHead(200, {
       'Content-Type': MIME_TYPES[ext] || 'application/octet-stream',
-      'Cache-Control': cacheControl
+      'Cache-Control': cacheControl,
+      ...SECURITY_HEADERS
     });
     res.end(data);
   } catch(err) {

@@ -7,6 +7,7 @@ const SONGS_FILE_STORE = 'handles';
 const SONGS_FILE_KEY = 'songs-json';
 const SONGS_FILE_NAME = 'worship-songs.json';
 const SONGS_API_URL = './api/songs';
+const ADMIN_TOKEN_SESSION_KEY = 'worship_admin_token_v1';
 const SONGS_PER_PAGE = 10;
 const LANG_LABELS   = { arabizi:'Arabizi', arabic:'عربي', en:'English', fr:'Français' };
 const LANG_FILTER_LABELS = {
@@ -78,6 +79,38 @@ function sharedSongsApiSupported() {
   return location.protocol !== 'file:' && 'fetch' in window;
 }
 
+function sharedSongsAdminToken() {
+  try {
+    return sessionStorage.getItem(ADMIN_TOKEN_SESSION_KEY) || '';
+  } catch(e) {
+    return '';
+  }
+}
+
+function sharedSongsSetAdminToken(value) {
+  try {
+    sessionStorage.setItem(ADMIN_TOKEN_SESSION_KEY, value);
+  } catch(e) {}
+}
+
+function sharedSongsClearAdminToken() {
+  try {
+    sessionStorage.removeItem(ADMIN_TOKEN_SESSION_KEY);
+  } catch(e) {}
+}
+
+function sharedSongsAuthHeaders() {
+  const token = sharedSongsAdminToken();
+  return token ? { 'Authorization': `Bearer ${token}` } : {};
+}
+
+function askSharedSongsAdminToken() {
+  const token = prompt('Admin password required to update the shared song library.')?.trim();
+  if(!token) return false;
+  sharedSongsSetAdminToken(token);
+  return true;
+}
+
 async function sharedSongsRead() {
   if(!sharedSongsApiSupported()) return null;
   const response = await fetch(SONGS_API_URL, {
@@ -95,17 +128,33 @@ async function sharedSongsWrite(arr) {
   if(!sharedSongsApiSupported()) return false;
   if(!SharedSongsApiAvailable) return false;
 
-  const response = await fetch(SONGS_API_URL, {
-    method: 'PUT',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: dbJsonText(arr),
-    cache: 'no-store'
-  });
-  if(!response.ok) throw new Error('Shared song library could not be saved.');
-  return true;
+  for(let attempt = 0; attempt < 2; attempt++) {
+    const response = await fetch(SONGS_API_URL, {
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        ...sharedSongsAuthHeaders()
+      },
+      body: dbJsonText(arr),
+      cache: 'no-store'
+    });
+
+    if(response.status === 401 || response.status === 403) {
+      sharedSongsClearAdminToken();
+      if(askSharedSongsAdminToken()) continue;
+      throw new Error('Admin password required to update shared songs.');
+    }
+
+    if(response.status === 503) {
+      throw new Error('Shared song editing is not configured on the server.');
+    }
+
+    if(!response.ok) throw new Error('Shared song library could not be saved.');
+    return true;
+  }
+
+  throw new Error('Admin password was not accepted.');
 }
 
 async function dbLoadFromSharedStore() {
@@ -247,7 +296,7 @@ async function dbPersistSongs(arr, options = {}) {
   try {
     if(await sharedSongsWrite(songs)) return true;
   } catch(e) {
-    showToast('Saved in this browser, but the shared library was not updated.');
+    showToast(e?.message || 'Saved in this browser, but the shared library was not updated.');
     return false;
   }
 

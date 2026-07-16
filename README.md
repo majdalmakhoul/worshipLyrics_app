@@ -7,6 +7,8 @@ A browser-based worship lyrics library and fullscreen slideshow view. This versi
 ```text
 worship-app/
 ├── index.html
+├── .env.example
+├── .gitignore
 ├── README.md
 ├── package.json
 ├── render.yaml
@@ -60,18 +62,27 @@ This repo includes `render.yaml` so Render can create the web service and persis
 3. Render will create a Node web service named `worship-lyrics-app`.
 4. The service uses `npm start` and stores shared songs at `/var/data/worship-songs.json`.
 5. The Blueprint attaches a 1 GB persistent disk named `song-library` at `/var/data`.
+6. Render will ask for `ADMIN_TOKEN`; enter a long private admin password and do not commit it to the repo.
 
 If creating the service manually instead of using the Blueprint, use:
 
 ```text
 Build Command: npm install
 Start Command: npm start
+Environment Variable: NODE_ENV=production
 Environment Variable: SONGS_FILE=/var/data/worship-songs.json
+Environment Variable: ADMIN_TOKEN=<long private admin password>
 Disk Mount Path: /var/data
 Disk Size: 1 GB
 ```
 
 Persistent disks require a paid Render web service. Start with 1 GB; Render lets you increase disk size later, but not decrease it.
+
+## Deployment security
+
+No API keys or private secrets should be committed to this repo. Keep real values in Render environment variables or in a local `.env` file that stays ignored by Git. `.env.example` is only a placeholder template.
+
+Shared songs are publicly readable by the app, but adding, editing, and deleting songs requires the `ADMIN_TOKEN` when `NODE_ENV=production`. The app asks for that admin password only when saving shared songs and keeps it in browser session storage, not in the source code. If the password is ever exposed, replace it in Render immediately.
 
 ## Add or edit songs
 
