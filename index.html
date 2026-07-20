@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#8BBFC4">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -22,6 +22,19 @@
 <body>
 
 <div class="toast" id="toast"></div>
+
+<div class="ios-install-guide" id="iosInstallGuide" role="dialog" aria-modal="true" aria-label="Install on iPhone">
+  <div class="ios-install-guide__box">
+    <button class="ios-install-guide__close" id="iosInstallCloseBtn" type="button" aria-label="Close install instructions">&times;</button>
+    <div class="ios-install-guide__title">Install on iPhone</div>
+    <ol class="ios-install-guide__steps">
+      <li>Open this site in Safari.</li>
+      <li>Tap the Share button.</li>
+      <li>Choose Add to Home Screen.</li>
+      <li>If shown, keep Open as Web App on, then tap Add.</li>
+    </ol>
+  </div>
+</div>
 
 <div class="lang-prompt" id="lyricsLangPrompt" role="dialog" aria-modal="true" aria-label="Choose lyrics language">
   <div class="lang-prompt__box">

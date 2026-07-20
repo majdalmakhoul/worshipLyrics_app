@@ -536,6 +536,43 @@
   text-align: center;
 }
 
+/* iOS install guide */
+.ios-install-guide {
+  display: none; position: fixed; inset: 0; z-index: 3700;
+  background: rgba(10,18,26,.58);
+  align-items: center; justify-content: center;
+  padding: 1rem;
+}
+.ios-install-guide.active { display: flex; }
+.ios-install-guide__box {
+  width: 100%; max-width: 360px;
+  position: relative;
+  background: var(--white);
+  border: var(--surface-border) solid var(--gray-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 1.15rem 1.25rem 1.25rem;
+}
+.ios-install-guide__close {
+  position: absolute; top: .65rem; right: .75rem;
+  background: none; border: none;
+  color: var(--gray); font-size: 20px; line-height: 1;
+}
+.ios-install-guide__close:hover { color: var(--black); }
+.ios-install-guide__title {
+  font-size: 15px; font-weight: 600;
+  color: var(--navy); margin-bottom: .75rem;
+}
+.ios-install-guide__steps {
+  padding-left: 1.25rem;
+  color: var(--black);
+  display: flex; flex-direction: column; gap: .5rem;
+}
+.ios-install-guide__steps li {
+  font-size: 13px;
+  line-height: 1.45;
+}
+
 /* Language prompt */
 .lang-prompt {
   display: none; position: fixed; inset: 0; z-index: 3600;

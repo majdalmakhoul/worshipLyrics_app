@@ -22,6 +22,19 @@ function pwaUpdateInstallButton() {
   btn.hidden = !pwaCanShowInstallButton();
 }
 
+function pwaOpenIosInstallGuide() {
+  const guide = document.getElementById('iosInstallGuide');
+  if(!guide) {
+    showToast('On iPhone or iPad, use Share, then Add to Home Screen.');
+    return;
+  }
+  guide.classList.add('active');
+}
+
+function pwaCloseIosInstallGuide() {
+  document.getElementById('iosInstallGuide')?.classList.remove('active');
+}
+
 async function pwaInstallClick() {
   if(DeferredInstallPrompt) {
     DeferredInstallPrompt.prompt();
@@ -33,12 +46,16 @@ async function pwaInstallClick() {
   }
 
   if(pwaIsIos()) {
-    showToast('On iPhone or iPad, use Share, then Add to Home Screen.');
+    pwaOpenIosInstallGuide();
   }
 }
 
 function wirePwaControls() {
   document.getElementById('pwaInstallBtn')?.addEventListener('click', pwaInstallClick);
+  document.getElementById('iosInstallCloseBtn')?.addEventListener('click', pwaCloseIosInstallGuide);
+  document.getElementById('iosInstallGuide')?.addEventListener('click', e => {
+    if(e.target.id === 'iosInstallGuide') pwaCloseIosInstallGuide();
+  });
 
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
