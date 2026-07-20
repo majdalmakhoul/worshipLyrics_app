@@ -116,19 +116,25 @@ function songCardHTML(s) {
   const isOpen   = openSongId === s.id;
   const catMod   = s.category || 'praise';
   const titleLang = s.mainLang || 'arabizi';
-  const titleClass = titleLang === 'arabic' ? 'song-card__arabic' : 'song-card__arabizi';
   const primaryTitle = songTitle(s);
+  const titleRowLangs = [titleLang, 'arabic'].filter((lang, index, arr) => s[lang] && arr.indexOf(lang) === index);
   const secondaryTitles = LANG_ORDER
-    .filter(l => l !== titleLang && s[l])
-    .map(l => s[l])
+    .filter(l => !titleRowLangs.includes(l) && s[l])
+    .map(l => ({ lang:l, title:s[l] }))
     .filter(Boolean);
   return `<article class="song-card${isOpen?' open':''}" id="card-${s.id}" role="listitem">
     <div class="song-card__header" onclick="toggleSong(${s.id})" onkeydown="songCardKey(event,${s.id})" role="button" tabindex="0" aria-expanded="${isOpen}">
       <div class="song-card__dot" aria-hidden="true"></div>
       <div class="song-card__titles">
-        <div class="${titleClass}">${escHtml(primaryTitle)}</div>
+        <div class="song-card__title-row">
+          ${titleRowLangs.map(lang => `
+            <span class="song-card__title song-card__title--${lang}">${escHtml(lang === titleLang ? primaryTitle : s[lang])}</span>
+          `).join('')}
+        </div>
         <div class="song-card__sub">
-          ${secondaryTitles.length ? `<span class="song-card__en">${escHtml(secondaryTitles.join(' ? '))}</span>` : ''}
+          ${secondaryTitles.map(({ lang, title }) => `
+            <span class="song-card__secondary song-card__secondary--${lang}">${escHtml(title)}</span>
+          `).join('')}
         </div>
       </div>
       <div class="song-card__meta">

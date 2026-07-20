@@ -88,7 +88,7 @@
   }
   .site-header__title { font-size: 1.7rem; }
   .site-header__sub { font-size: 11px; line-height: 1.5; }
-  .song-card__arabizi  { font-size: 15px; }
+  .song-card__title    { font-size: 15px; }
   .badge               { display: none; }
   .ss-view             { overflow-y: auto; }
   .ss-stage            { padding: 3rem 1.5rem; }

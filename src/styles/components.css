@@ -99,17 +99,35 @@
 .song-card.open .song-card__dot { opacity: 1; background: var(--navy); }
 
 .song-card__titles { flex: 1; min-width: 0; }
-.song-card__arabizi {
+.song-card__title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.song-card__title {
   font-family: var(--font-display);
   font-size: 17px; font-weight: 600;
   color: var(--black); line-height: 1.2;
+}
+.song-card__title--arabic {
+  direction: rtl;
+  font-family: var(--font-arabic);
 }
 .song-card__sub {
   display: flex; gap: 10px;
   margin-top: 3px; flex-wrap: wrap; align-items: baseline;
 }
-.song-card__arabic   { font-size: 14px; color: var(--gray); direction: rtl; font-family: var(--font-arabic); }
-.song-card__en       { font-size: 12px; color: var(--gray); font-style: italic; }
+.song-card__secondary {
+  font-size: 12px;
+  color: var(--gray);
+  font-style: italic;
+}
+.song-card__secondary--arabic {
+  direction: rtl;
+  font-family: var(--font-arabic);
+  font-style: normal;
+}
 .song-card__meta     { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .song-card__chevron  { color: var(--teal-dark); transition: transform .22s; flex-shrink: 0; }
 .song-card.open .song-card__chevron { transform: rotate(180deg); }
