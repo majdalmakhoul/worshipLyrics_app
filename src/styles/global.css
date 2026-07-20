@@ -182,7 +182,10 @@
    RESET & BASE
 ============================================= */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  touch-action: manipulation;
+}
 body {
   font-family: var(--font-body);
   background: var(--off-white);
@@ -190,5 +193,10 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
-button { font-family: var(--font-body); cursor: pointer; }
+button, [role="button"] {
+  font-family: var(--font-body);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
 input, textarea, select { font-family: var(--font-body); }
