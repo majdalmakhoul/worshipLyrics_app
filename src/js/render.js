@@ -568,17 +568,20 @@ async function devSaveSong() {
     return;
   }
 
+  let saveAction = 'added';
   if(devEditingId !== null) {
     const idx = DB.findIndex(s=>s.id===devEditingId);
     if(idx!==-1) DB[idx] = {id:devEditingId, category, mainLang, hasArabizi, showLabels, arabizi, arabic, en, fr, slides, sections};
-    showToast(`"${titles[mainLang]}" updated`);
+    saveAction = 'updated';
   } else {
     const newId = DB.length>0 ? Math.max(...DB.map(s=>s.id))+1 : 1;
     DB.push({ id:newId, category, mainLang, hasArabizi, showLabels, arabizi, arabic, en, fr, slides, sections });
-    showToast(`"${titles[mainLang]}" added`);
   }
 
-  await dbSave(DB);
+  const savedShared = await dbSave(DB);
+  showToast(savedShared
+    ? `"${titles[mainLang]}" ${saveAction} in shared library`
+    : `"${titles[mainLang]}" ${saveAction} on this device only`);
   devResetForm();
   render();
 }
@@ -606,8 +609,11 @@ function devEditSong(id)   { const s=DB.find(s=>s.id===id); if(s) devLoadSong(s)
 async function devDeleteSong(id) {
   const s=DB.find(s=>s.id===id); if(!s) return;
   if(!confirm(`Delete "${songTitle(s)}"? This cannot be undone.`)) return;
-  DB=DB.filter(x=>x.id!==id); await dbSave(DB);
-  showToast(`"${songTitle(s)}" deleted`);
+  DB=DB.filter(x=>x.id!==id);
+  const savedShared = await dbSave(DB);
+  showToast(savedShared
+    ? `"${songTitle(s)}" deleted from shared library`
+    : `"${songTitle(s)}" deleted on this device only`);
   devRenderManager(); render();
 }
 
