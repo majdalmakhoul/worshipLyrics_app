@@ -1,8 +1,11 @@
 {
   "engines": {
-    "node": ">=20"
+    "node": ">=22 <25"
   },
   "scripts": {
     "start": "node server.js"
+  },
+  "dependencies": {
+    "@vercel/blob": "^2.6.1"
   }
 }
