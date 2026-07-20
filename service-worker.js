@@ -1,26 +1,26 @@
-const CACHE_NAME = 'worship-lyrics-app-v2';
+const CACHE_NAME = 'worship-lyrics-app-v3';
 const APP_SHELL = [
-  './',
-  './index.html',
-  './manifest.webmanifest',
-  './src/styles/global.css',
-  './src/styles/layout.css',
-  './src/styles/components.css',
-  './src/styles/slideshow.css',
-  './src/js/data.js',
-  './src/js/search.js',
-  './src/js/projection.js',
-  './src/js/render.js',
-  './src/js/slideshow.js',
-  './src/js/pptx.js',
-  './src/js/appearance.js',
-  './src/js/pwa.js',
-  './src/js/main.js',
-  './src/icons/icon.svg',
-  './src/icons/icon-maskable.svg',
-  './src/icons/icon-192.png',
-  './src/icons/icon-512.png',
-  './src/icons/apple-touch-icon.png'
+  '/',
+  '/index.html',
+  '/manifest.webmanifest',
+  '/src/styles/global.css',
+  '/src/styles/layout.css',
+  '/src/styles/components.css',
+  '/src/styles/slideshow.css',
+  '/src/js/data.js',
+  '/src/js/search.js',
+  '/src/js/projection.js',
+  '/src/js/render.js',
+  '/src/js/slideshow.js',
+  '/src/js/pptx.js',
+  '/src/js/appearance.js',
+  '/src/js/pwa.js',
+  '/src/js/main.js',
+  '/src/icons/icon.svg',
+  '/src/icons/icon-maskable.svg',
+  '/src/icons/icon-192.png',
+  '/src/icons/icon-512.png',
+  '/src/icons/apple-touch-icon.png'
 ];
 
 self.addEventListener('install', event => {
@@ -58,7 +58,7 @@ self.addEventListener('fetch', event => {
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
         }
         return response;
-      }).catch(() => caches.match('./index.html'));
+      }).catch(() => caches.match('/index.html'));
     })
   );
 });
