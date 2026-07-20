@@ -126,7 +126,6 @@ async function sharedSongsRead() {
 
 async function sharedSongsWrite(arr) {
   if(!sharedSongsApiSupported()) return false;
-  if(!SharedSongsApiAvailable) return false;
 
   for(let attempt = 0; attempt < 2; attempt++) {
     const response = await fetch(SONGS_API_URL, {
@@ -150,7 +149,12 @@ async function sharedSongsWrite(arr) {
       throw new Error('Shared song editing is not configured on the server.');
     }
 
+    if(response.status >= 500) {
+      throw new Error('Shared song server error. Check the Vercel function logs.');
+    }
+
     if(!response.ok) throw new Error('Shared song library could not be saved.');
+    SharedSongsApiAvailable = true;
     return true;
   }
 

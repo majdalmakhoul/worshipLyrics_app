@@ -33,6 +33,10 @@ function songsBlobToken() {
   return process.env.SONGS_BLOB_TOKEN || process.env.BLOB_READ_WRITE_TOKEN || '';
 }
 
+function songsBlobStoreId() {
+  return process.env.SONGS_BLOB_STORE_ID || process.env.BLOB_STORE_ID || '';
+}
+
 function parseSongsJson(raw) {
   if(!raw.trim()) return [];
   const parsed = JSON.parse(raw);
@@ -43,6 +47,7 @@ function parseSongsJson(raw) {
 function songsBlobOptions(extra = {}) {
   const access = songsBlobAccess();
   const token = songsBlobToken();
+  const storeId = songsBlobStoreId();
 
   if(access !== 'private' && access !== 'public') {
     throw new Error('SONGS_BLOB_ACCESS must be "private" or "public".');
@@ -51,6 +56,7 @@ function songsBlobOptions(extra = {}) {
   return {
     access,
     ...(token ? { token } : {}),
+    ...(storeId ? { storeId } : {}),
     ...extra
   };
 }
