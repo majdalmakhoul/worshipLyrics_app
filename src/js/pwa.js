@@ -40,6 +40,7 @@ async function pwaInstallClick() {
     DeferredInstallPrompt.prompt();
     const choice = await DeferredInstallPrompt.userChoice;
     DeferredInstallPrompt = null;
+    if(typeof appMenuClose === 'function') appMenuClose();
     pwaUpdateInstallButton();
     if(choice?.outcome === 'accepted') showToast('App installed.');
     return;
@@ -47,7 +48,12 @@ async function pwaInstallClick() {
 
   if(pwaIsIos()) {
     pwaOpenIosInstallGuide();
+    if(typeof appMenuClose === 'function') appMenuClose();
+    return;
   }
+
+  showToast('Install is not available in this browser.');
+  if(typeof appMenuClose === 'function') appMenuClose();
 }
 
 function wirePwaControls() {
@@ -76,7 +82,9 @@ function registerServiceWorker() {
   if(!('serviceWorker' in navigator)) return;
   if(location.protocol === 'file:') return;
 
-  navigator.serviceWorker.register('/service-worker.js', { scope: '/' }).catch(err => {
-    console.warn('Service worker registration failed.', err);
-  });
+  navigator.serviceWorker.register('/service-worker.js', { scope: '/' })
+    .then(registration => registration.update())
+    .catch(err => {
+      console.warn('Service worker registration failed.', err);
+    });
 }

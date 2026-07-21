@@ -23,6 +23,29 @@
 
 <div class="toast" id="toast"></div>
 
+<div class="app-menu" id="appMenu" aria-hidden="true">
+  <button class="app-menu__scrim" id="appMenuScrim" type="button" tabindex="-1" aria-label="Close menu"></button>
+  <aside class="app-menu__drawer" role="dialog" aria-modal="true" aria-label="App menu" inert>
+    <div class="app-menu__header">
+      <div>
+        <div class="app-menu__eyebrow">Menu</div>
+        <div class="app-menu__title">Worship Lyrics</div>
+      </div>
+      <button class="app-menu__close" id="appMenuCloseBtn" type="button" aria-label="Close menu">&times;</button>
+    </div>
+    <div class="app-menu__actions">
+      <button class="app-menu__item" id="pwaInstallBtn" type="button" hidden>
+        <svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+        <span>Install app</span>
+      </button>
+      <button class="app-menu__item" id="appearanceOpenBtn" type="button">
+        <svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.04.04a2.1 2.1 0 0 1-2.97 2.97l-.04-.04a1.8 1.8 0 0 0-1.98-.36 1.8 1.8 0 0 0-1.09 1.65V21a2.1 2.1 0 0 1-4.2 0v-.06A1.8 1.8 0 0 0 8.43 19.3a1.8 1.8 0 0 0-1.98.36l-.04.04a2.1 2.1 0 0 1-2.97-2.97l.04-.04A1.8 1.8 0 0 0 3.84 15a1.8 1.8 0 0 0-1.65-1.09H2.1a2.1 2.1 0 0 1 0-4.2h.06a1.8 1.8 0 0 0 1.65-1.09 1.8 1.8 0 0 0-.36-1.98l-.04-.04a2.1 2.1 0 0 1 2.97-2.97l.04.04a1.8 1.8 0 0 0 1.98.36h.03A1.8 1.8 0 0 0 9.5 2.4V2.1a2.1 2.1 0 0 1 4.2 0v.06A1.8 1.8 0 0 0 14.8 3.8a1.8 1.8 0 0 0 1.98-.36l.04-.04a2.1 2.1 0 0 1 2.97 2.97l-.04.04a1.8 1.8 0 0 0-.36 1.98v.03a1.8 1.8 0 0 0 1.65 1.09h.06a2.1 2.1 0 0 1 0 4.2h-.06A1.8 1.8 0 0 0 19.4 15Z"/></svg>
+        <span>Customize</span>
+      </button>
+    </div>
+  </aside>
+</div>
+
 <div class="ios-install-guide" id="iosInstallGuide" role="dialog" aria-modal="true" aria-label="Install on iPhone">
   <div class="ios-install-guide__box">
     <button class="ios-install-guide__close" id="iosInstallCloseBtn" type="button" aria-label="Close install instructions">&times;</button>
@@ -163,16 +186,12 @@
           </div>
           <div class="dev-grid-3">
             <div class="dev-field">
-              <label class="dev-field__label" for="fArabic">Arabic <span>عربي</span></label>
+              <label class="dev-field__label" for="fArabic"><span>عربي</span></label>
               <input class="dev-input rtl" id="fArabic" type="text" placeholder="يا رب">
             </div>
             <div class="dev-field">
               <label class="dev-field__label" for="fEn">English</label>
               <input class="dev-input" id="fEn" type="text" placeholder="Oh Lord">
-            </div>
-            <div class="dev-field">
-              <label class="dev-field__label" for="fFr">Français</label>
-              <input class="dev-input" id="fFr" type="text" placeholder="Ô Seigneur">
             </div>
           </div>
         </div>
@@ -193,9 +212,8 @@
             </div>
             <div class="smart-lang-tabs" id="smartLangTabs">
               <button class="smart-lang-tab active" data-smart-lang="arabizi">Arabizi</button>
-              <button class="smart-lang-tab" data-smart-lang="arabic">Arabic عربي</button>
+              <button class="smart-lang-tab" data-smart-lang="arabic">عربي</button>
               <button class="smart-lang-tab" data-smart-lang="en">English</button>
-              <button class="smart-lang-tab" data-smart-lang="fr">Français</button>
             </div>
             <div class="pptx-import">
               <input class="pptx-input" id="pptxFileInput" type="file" accept=".pptx,application/vnd.openxmlformats-officedocument.presentationml.presentation">
@@ -257,20 +275,12 @@
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <header class="site-header">
   <div class="site-header__top">
+    <button class="site-header__menu" id="appMenuOpenBtn" type="button" aria-label="Open menu" aria-controls="appMenu" aria-expanded="false">
+      <svg width="21" height="21" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
     <p class="site-header__ornament">✦ ✦ ✦</p>
-    <div class="site-header__actions">
-      <button class="site-header__install" id="pwaInstallBtn" type="button" hidden>
-        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
-        Install
-      </button>
-      <button class="site-header__customize" id="appearanceOpenBtn" type="button">
-        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.04.04a2.1 2.1 0 0 1-2.97 2.97l-.04-.04a1.8 1.8 0 0 0-1.98-.36 1.8 1.8 0 0 0-1.09 1.65V21a2.1 2.1 0 0 1-4.2 0v-.06A1.8 1.8 0 0 0 8.43 19.3a1.8 1.8 0 0 0-1.98.36l-.04.04a2.1 2.1 0 0 1-2.97-2.97l.04-.04A1.8 1.8 0 0 0 3.84 15a1.8 1.8 0 0 0-1.65-1.09H2.1a2.1 2.1 0 0 1 0-4.2h.06a1.8 1.8 0 0 0 1.65-1.09 1.8 1.8 0 0 0-.36-1.98l-.04-.04a2.1 2.1 0 0 1 2.97-2.97l.04.04a1.8 1.8 0 0 0 1.98.36h.03A1.8 1.8 0 0 0 9.5 2.4V2.1a2.1 2.1 0 0 1 4.2 0v.06A1.8 1.8 0 0 0 14.8 3.8a1.8 1.8 0 0 0 1.98-.36l.04-.04a2.1 2.1 0 0 1 2.97 2.97l-.04.04a1.8 1.8 0 0 0-.36 1.98v.03a1.8 1.8 0 0 0 1.65 1.09h.06a2.1 2.1 0 0 1 0 4.2h-.06A1.8 1.8 0 0 0 19.4 15Z"/></svg>
-        Customize
-      </button>
-    </div>
   </div>
   <h1 class="site-header__title">Worship Lyrics</h1>
-  <p class="site-header__sub">Arabic · Arabizi · English · Français</p>
 </header>
 
 <main class="container">

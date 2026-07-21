@@ -101,6 +101,7 @@ function appearanceApply(settings = Appearance) {
 
 function appearanceOpen() {
   appearanceRenderControls();
+  if(typeof appMenuClose === 'function') appMenuClose();
   document.getElementById('appearancePanel')?.classList.add('active');
 }
 

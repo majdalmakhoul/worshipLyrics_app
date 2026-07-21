@@ -1,6 +1,46 @@
 ﻿/* ================================================================
    ENTRY POINT & EVENT WIRING
 ================================================================ */
+let AppMenuLastFocus = null;
+
+function appMenuIsOpen() {
+  return document.getElementById('appMenu')?.classList.contains('active');
+}
+
+function appMenuOpen() {
+  const menu = document.getElementById('appMenu');
+  const drawer = menu?.querySelector('.app-menu__drawer');
+  const openBtn = document.getElementById('appMenuOpenBtn');
+  const closeBtn = document.getElementById('appMenuCloseBtn');
+  if(!menu) return;
+
+  AppMenuLastFocus = document.activeElement;
+  drawer?.removeAttribute('inert');
+  menu.classList.add('active');
+  menu.setAttribute('aria-hidden', 'false');
+  openBtn?.setAttribute('aria-expanded', 'true');
+  document.body.style.overflow = 'hidden';
+  closeBtn?.focus({ preventScroll: true });
+}
+
+function appMenuClose() {
+  const menu = document.getElementById('appMenu');
+  const drawer = menu?.querySelector('.app-menu__drawer');
+  const openBtn = document.getElementById('appMenuOpenBtn');
+  if(!menu) return;
+
+  menu.classList.remove('active');
+  menu.setAttribute('aria-hidden', 'true');
+  drawer?.setAttribute('inert', '');
+  openBtn?.setAttribute('aria-expanded', 'false');
+  document.body.style.overflow = '';
+
+  if(AppMenuLastFocus && typeof AppMenuLastFocus.focus === 'function') {
+    AppMenuLastFocus.focus({ preventScroll: true });
+  }
+  AppMenuLastFocus = null;
+}
+
 function closeScreenPickerDropdowns() {
   document.querySelectorAll('.screen-picker__dropdown').forEach(dropdown => dropdown.classList.remove('open'));
 }
@@ -10,6 +50,11 @@ function handleGlobalKeydown(e) {
     if(e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); ssStep(1); }
     else if(e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); ssStep(-1); }
     else if(e.key === 'Escape') ssClose();
+    return;
+  }
+
+  if(e.key === 'Escape' && appMenuIsOpen()) {
+    appMenuClose();
     return;
   }
 
@@ -42,6 +87,12 @@ function handleFullscreenChange() {
     return;
   }
   ssScheduleFit();
+}
+
+function wireAppMenuControls() {
+  document.getElementById('appMenuOpenBtn')?.addEventListener('click', appMenuOpen);
+  document.getElementById('appMenuCloseBtn')?.addEventListener('click', appMenuClose);
+  document.getElementById('appMenuScrim')?.addEventListener('click', appMenuClose);
 }
 
 function wireSearchControls() {
@@ -119,6 +170,7 @@ function wireDevPanelControls() {
 }
 
 async function initApp() {
+  wireAppMenuControls();
   wireAppearanceControls();
   wirePwaControls();
   wireSearchControls();
