@@ -45,7 +45,26 @@ function closeScreenPickerDropdowns() {
   document.querySelectorAll('.screen-picker__dropdown').forEach(dropdown => dropdown.classList.remove('open'));
 }
 
+function isDevPanelShortcut(e) {
+  const key = typeof e.key === 'string' ? e.key.toLowerCase() : '';
+  return (e.ctrlKey || e.metaKey) && e.shiftKey && !e.altKey && (key === 'd' || e.code === 'KeyD');
+}
+
+function toggleDevPanel() {
+  if(typeof devOpen !== 'function' || typeof devClose !== 'function') return;
+  if(appMenuIsOpen()) appMenuClose();
+  document.getElementById('devPanel')?.classList.contains('active') ? devClose() : devOpen();
+}
+
 function handleGlobalKeydown(e) {
+  if(isDevPanelShortcut(e)) {
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation?.();
+    toggleDevPanel();
+    return;
+  }
+
   if(document.getElementById('slideshow').classList.contains('active')) {
     if(e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); ssStep(1); }
     else if(e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); ssStep(-1); }
@@ -73,10 +92,6 @@ function handleGlobalKeydown(e) {
     return;
   }
 
-  if((e.ctrlKey || e.metaKey) && e.shiftKey && e.key?.toLowerCase() === 'd') {
-    e.preventDefault();
-    document.getElementById('devPanel').classList.contains('active') ? devClose() : devOpen();
-  }
 }
 
 function handleFullscreenChange() {
@@ -93,6 +108,7 @@ function wireAppMenuControls() {
   document.getElementById('appMenuOpenBtn')?.addEventListener('click', appMenuOpen);
   document.getElementById('appMenuCloseBtn')?.addEventListener('click', appMenuClose);
   document.getElementById('appMenuScrim')?.addEventListener('click', appMenuClose);
+  document.getElementById('devMenuOpenBtn')?.addEventListener('click', toggleDevPanel);
 }
 
 function wireSearchControls() {
@@ -177,7 +193,7 @@ async function initApp() {
   wireSlideshowControls();
   wireDevPanelControls();
   document.addEventListener('click', closeScreenPickerDropdowns);
-  document.addEventListener('keydown', handleGlobalKeydown);
+  window.addEventListener('keydown', handleGlobalKeydown, { capture: true });
   document.addEventListener('fullscreenchange', handleFullscreenChange);
 
   const loadedSharedSongs = await dbLoadFromSharedStore();
