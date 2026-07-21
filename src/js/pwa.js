@@ -13,7 +13,7 @@ function pwaIsIos() {
 }
 
 function pwaCanShowInstallButton() {
-  return !pwaIsStandalone() && (!!DeferredInstallPrompt || pwaIsIos());
+  return !pwaIsStandalone();
 }
 
 function pwaUpdateInstallButton() {
@@ -29,6 +29,10 @@ function pwaOpenIosInstallGuide() {
     return;
   }
   guide.classList.add('active');
+}
+
+function pwaShowInstallFallback() {
+  showToast('Use your browser menu, then choose Install app or Add to Home Screen.');
 }
 
 function pwaCloseIosInstallGuide() {
@@ -52,7 +56,7 @@ async function pwaInstallClick() {
     return;
   }
 
-  showToast('Install is not available in this browser.');
+  pwaShowInstallFallback();
   if(typeof appMenuClose === 'function') appMenuClose();
 }
 

@@ -73,7 +73,7 @@ function handleGlobalKeydown(e) {
     return;
   }
 
-  if((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'D') {
+  if((e.ctrlKey || e.metaKey) && e.shiftKey && e.key?.toLowerCase() === 'd') {
     e.preventDefault();
     document.getElementById('devPanel').classList.contains('active') ? devClose() : devOpen();
   }
