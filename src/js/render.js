@@ -444,11 +444,32 @@ function fallbackSplit(text, lang) {
 
 /* ================================================================
    DEV PANEL
-================================================================ */let devEditingId   = null;
+================================================================ */
+let devEditingId   = null;
 let devSlideCount  = 0;
+let devAccessGrantedForNextOpen = false;
 
-function devOpen()  { devResetForm(); devSwitchTab('add'); document.getElementById('devPanel').classList.add('active'); document.body.style.overflow='hidden'; }
-function devClose() { document.getElementById('devPanel').classList.remove('active'); document.body.style.overflow=''; }
+function devGrantAccessForNextOpen() {
+  devAccessGrantedForNextOpen = true;
+}
+
+function devOpen()  {
+  if(!devAccessGrantedForNextOpen) {
+    showToast('Enter the modification password from the Dev button first.');
+    return;
+  }
+
+  devAccessGrantedForNextOpen = false;
+  devResetForm();
+  devSwitchTab('add');
+  document.getElementById('devPanel').classList.add('active');
+  document.body.style.overflow='hidden';
+}
+function devClose() {
+  document.getElementById('devPanel').classList.remove('active');
+  document.body.style.overflow='';
+  if(typeof sharedSongsClearAdminToken === 'function') sharedSongsClearAdminToken();
+}
 
 function devSwitchTab(tab) {
   document.getElementById('devTabAdd').classList.toggle('active',    tab==='add');

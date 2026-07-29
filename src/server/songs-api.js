@@ -71,14 +71,10 @@ function secureTokenEquals(received, expected) {
 
 function requireAdminWrite(req, res) {
   const adminToken = process.env.ADMIN_TOKEN || '';
-  const isProduction = process.env.NODE_ENV === 'production';
 
   if(!adminToken) {
-    if(isProduction) {
-      sendJson(res, 503, { error: 'Admin token is not configured.' });
-      return false;
-    }
-    return true;
+    sendJson(res, 503, { error: 'Admin token is not configured.' });
+    return false;
   }
 
   if(secureTokenEquals(bearerToken(req), adminToken)) return true;
@@ -89,7 +85,24 @@ function requireAdminWrite(req, res) {
   return false;
 }
 
+function songsApiUrl(req) {
+  return new URL(req.url || '/api/songs', `http://${req.headers.host || 'localhost'}`);
+}
+
 async function handleSongsApi(req, res) {
+  const url = songsApiUrl(req);
+
+  if(url.searchParams.get('verify') === '1') {
+    if(req.method !== 'POST') {
+      sendJson(res, 405, { error: 'Method not allowed.' });
+      return;
+    }
+
+    if(!requireAdminWrite(req, res)) return;
+    sendJson(res, 200, { ok: true });
+    return;
+  }
+
   if(req.method === 'GET') {
     sendJson(res, 200, await readSongs());
     return;

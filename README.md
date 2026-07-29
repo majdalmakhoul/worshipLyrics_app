@@ -46,6 +46,7 @@ For installable web-app behavior, serve the folder over `http://localhost` or de
 For shared songs across devices, run the included server:
 
 ```powershell
+$env:ADMIN_TOKEN='<private admin password>'
 npm start
 ```
 
@@ -97,11 +98,11 @@ If creating the app manually in the Azure portal:
 
 No API keys or private secrets should be committed to this repo. Keep real values in Azure App Service application settings or in a local `.env` file that stays ignored by Git. `.env.example` and `azure-app-settings.example.json` are placeholder templates only.
 
-Shared songs are publicly readable by the app, but adding, editing, and deleting songs requires the `ADMIN_TOKEN` when `NODE_ENV=production`. The app asks for that admin password only when saving shared songs and keeps it in browser session storage, not in the source code. If the password is ever exposed, replace it in Azure immediately.
+Shared songs are publicly readable by the app, but adding, editing, and deleting songs requires the `ADMIN_TOKEN` in every served environment. The app asks for that modification password before opening the Dev panel and keeps it in browser session storage only while the panel is open, not in the source code. If the password is ever exposed, replace it in Azure immediately.
 
 ## Add or edit songs
 
-Use ------ in the app to open the dev panel. When the app is served by `server.js`, songs are saved through `/api/songs`, so every device using the same hosted app sees the same library. In production, set `SONGS_FILE` to a persistent path, such as `/home/data/worship-songs.json` on Azure App Service.
+Use the `Dev` button in the top-right of the app and enter the modification password to open the dev panel. When the app is served by `server.js`, songs are saved through `/api/songs`, so every device using the same hosted app sees the same library. In production, set `SONGS_FILE` to a persistent path, such as `/home/data/worship-songs.json` on Azure App Service.
 
 If the shared API is unavailable, the app falls back to browser `localStorage` under the key `worship_songs_v1`.
 

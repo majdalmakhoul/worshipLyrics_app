@@ -99,16 +99,39 @@ function sharedSongsClearAdminToken() {
   } catch(e) {}
 }
 
-function sharedSongsAuthHeaders() {
-  const token = sharedSongsAdminToken();
+function sharedSongsAuthHeaders(token = sharedSongsAdminToken()) {
   return token ? { 'Authorization': `Bearer ${token}` } : {};
 }
 
-function askSharedSongsAdminToken() {
-  const token = prompt('Admin password required to update the shared song library.')?.trim();
+function askSharedSongsAdminToken(message = 'Modification password required to update the shared song library.') {
+  const token = prompt(message)?.trim();
   if(!token) return false;
   sharedSongsSetAdminToken(token);
   return true;
+}
+
+async function sharedSongsVerifyAdminToken(token) {
+  if(!sharedSongsApiSupported()) {
+    throw new Error('Dev access requires the hosted app.');
+  }
+
+  const response = await fetch(`${SONGS_API_URL}?verify=1`, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      ...sharedSongsAuthHeaders(token)
+    },
+    cache: 'no-store'
+  });
+
+  if(response.ok) {
+    SharedSongsApiAvailable = true;
+    return true;
+  }
+
+  if(response.status === 401 || response.status === 403) return false;
+  if(response.status === 503) throw new Error('Shared song editing is not configured on the server.');
+  throw new Error('Could not verify the modification password.');
 }
 
 async function sharedSongsRead() {

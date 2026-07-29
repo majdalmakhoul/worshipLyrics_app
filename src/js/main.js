@@ -2,6 +2,9 @@
    ENTRY POINT & EVENT WIRING
 ================================================================ */
 let AppMenuLastFocus = null;
+let DevAccessPromptResolve = null;
+let DevAccessLastFocus = null;
+let DevAccessRequestRunning = false;
 
 function appMenuIsOpen() {
   return document.getElementById('appMenu')?.classList.contains('active');
@@ -45,26 +48,101 @@ function closeScreenPickerDropdowns() {
   document.querySelectorAll('.screen-picker__dropdown').forEach(dropdown => dropdown.classList.remove('open'));
 }
 
-function isDevPanelShortcut(e) {
-  const key = typeof e.key === 'string' ? e.key.toLowerCase() : '';
-  return (e.ctrlKey || e.metaKey) && e.shiftKey && !e.altKey && (key === 'd' || e.code === 'KeyD');
+function devAccessPromptIsOpen() {
+  return document.getElementById('devAccessPrompt')?.classList.contains('active');
 }
 
-function toggleDevPanel() {
-  if(typeof devOpen !== 'function' || typeof devClose !== 'function') return;
-  if(appMenuIsOpen()) appMenuClose();
-  document.getElementById('devPanel')?.classList.contains('active') ? devClose() : devOpen();
+function devAccessOpen(errorText = '') {
+  const prompt = document.getElementById('devAccessPrompt');
+  const input = document.getElementById('devAccessToken');
+  const error = document.getElementById('devAccessError');
+  if(!prompt || !input) return Promise.resolve(null);
+
+  DevAccessLastFocus = document.activeElement;
+  input.value = '';
+  if(error) error.textContent = errorText;
+  prompt.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  input.focus({ preventScroll: true });
+
+  return new Promise(resolve => {
+    DevAccessPromptResolve = resolve;
+  });
 }
 
-function handleGlobalKeydown(e) {
-  if(isDevPanelShortcut(e)) {
-    e.preventDefault();
-    e.stopPropagation();
-    e.stopImmediatePropagation?.();
-    toggleDevPanel();
+function devAccessClose(token = null) {
+  document.getElementById('devAccessPrompt')?.classList.remove('active');
+  if(!document.getElementById('devPanel')?.classList.contains('active')) document.body.style.overflow = '';
+
+  const resolve = DevAccessPromptResolve;
+  DevAccessPromptResolve = null;
+  if(resolve) resolve(token);
+
+  if(DevAccessLastFocus && typeof DevAccessLastFocus.focus === 'function') {
+    DevAccessLastFocus.focus({ preventScroll: true });
+  }
+  DevAccessLastFocus = null;
+}
+
+function devAccessSubmit(e) {
+  e.preventDefault();
+  const input = document.getElementById('devAccessToken');
+  const error = document.getElementById('devAccessError');
+  const token = input?.value.trim() || '';
+  if(!token) {
+    if(error) error.textContent = 'Enter the modification password.';
+    input?.focus({ preventScroll: true });
+    return;
+  }
+  devAccessClose(token);
+}
+
+function devAccessCancel() {
+  devAccessClose(null);
+}
+
+async function openDevPanelWithAccess() {
+  if(DevAccessRequestRunning) return;
+  if(typeof devOpen !== 'function') return;
+
+  if(document.getElementById('devPanel')?.classList.contains('active')) {
+    devClose();
     return;
   }
 
+  if(appMenuIsOpen()) appMenuClose();
+
+  DevAccessRequestRunning = true;
+  let errorText = '';
+
+  try {
+    for(let attempt = 0; attempt < 2; attempt++) {
+      const token = await devAccessOpen(errorText);
+      if(!token) return;
+
+      const accepted = await sharedSongsVerifyAdminToken(token);
+      if(accepted) {
+        sharedSongsSetAdminToken(token);
+        if(typeof devGrantAccessForNextOpen === 'function') devGrantAccessForNextOpen();
+        devOpen();
+        return;
+      }
+
+      sharedSongsClearAdminToken();
+      errorText = 'Password was not accepted.';
+    }
+
+    showToast('Password was not accepted.');
+  } catch(err) {
+    console.error(err);
+    sharedSongsClearAdminToken();
+    showToast(err?.message || 'Could not verify the modification password.');
+  } finally {
+    DevAccessRequestRunning = false;
+  }
+}
+
+function handleGlobalKeydown(e) {
   if(document.getElementById('slideshow').classList.contains('active')) {
     if(e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); ssStep(1); }
     else if(e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); ssStep(-1); }
@@ -74,6 +152,11 @@ function handleGlobalKeydown(e) {
 
   if(e.key === 'Escape' && appMenuIsOpen()) {
     appMenuClose();
+    return;
+  }
+
+  if(e.key === 'Escape' && devAccessPromptIsOpen()) {
+    devAccessCancel();
     return;
   }
 
@@ -108,7 +191,15 @@ function wireAppMenuControls() {
   document.getElementById('appMenuOpenBtn')?.addEventListener('click', appMenuOpen);
   document.getElementById('appMenuCloseBtn')?.addEventListener('click', appMenuClose);
   document.getElementById('appMenuScrim')?.addEventListener('click', appMenuClose);
-  document.getElementById('devMenuOpenBtn')?.addEventListener('click', toggleDevPanel);
+}
+
+function wireDevAccessControls() {
+  document.getElementById('devAccessBtn')?.addEventListener('click', openDevPanelWithAccess);
+  document.getElementById('devAccessForm')?.addEventListener('submit', devAccessSubmit);
+  document.getElementById('devAccessCancel')?.addEventListener('click', devAccessCancel);
+  document.getElementById('devAccessPrompt')?.addEventListener('click', e => {
+    if(e.target.id === 'devAccessPrompt') devAccessCancel();
+  });
 }
 
 function wireSearchControls() {
@@ -187,6 +278,7 @@ function wireDevPanelControls() {
 
 async function initApp() {
   wireAppMenuControls();
+  wireDevAccessControls();
   wireAppearanceControls();
   wirePwaControls();
   wireSearchControls();

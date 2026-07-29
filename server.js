@@ -5,6 +5,7 @@ const { SECURITY_HEADERS, handleSongsApi, sendJson } = require('./src/server/son
 
 const ROOT = __dirname;
 const PORT = Number(process.env.PORT || 8080);
+const HOST = process.env.HOST || '0.0.0.0';
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -74,6 +75,6 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Worship Lyrics server running on port ${PORT}`);
+server.listen(PORT, HOST, () => {
+  console.log(`Worship Lyrics server running on ${HOST}:${PORT}`);
 });

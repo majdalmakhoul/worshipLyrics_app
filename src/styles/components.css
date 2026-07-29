@@ -542,6 +542,61 @@
 }
 
 /* =============================================
+   DEV ACCESS PROMPT
+============================================= */
+.dev-access {
+  display: none; position: fixed; inset: 0; z-index: 3650;
+  background: rgba(10,18,26,.58);
+  align-items: center; justify-content: center;
+  padding: 1rem;
+}
+.dev-access.active { display: flex; }
+.dev-access__box {
+  width: 100%; max-width: 360px;
+  background: var(--white);
+  border: var(--surface-border) solid var(--gray-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 1rem;
+}
+.dev-access__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: .75rem;
+}
+.dev-access__label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--gray);
+  margin-bottom: 5px;
+}
+.dev-access__input {
+  width: 100%;
+  font-size: 14px;
+  padding: 8px 12px;
+  border: var(--surface-border) solid var(--gray-light);
+  border-radius: var(--radius-sm);
+  color: var(--black);
+  background: var(--white);
+  outline: none;
+  transition: border-color var(--transition);
+}
+.dev-access__input:focus { border-color: var(--teal); }
+.dev-access__error {
+  min-height: 1.35em;
+  color: var(--red);
+  font-size: 12px;
+  margin: .45rem 0 .85rem;
+}
+.dev-access__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* =============================================
    TOAST
 ============================================= */
 .toast {
@@ -720,10 +775,12 @@
     grid-template-columns: 1fr 1fr;
   }
   .appearance-panel,
+  .dev-access,
   .lang-prompt {
     padding: .75rem;
   }
   .appearance-panel__box,
+  .dev-access__box,
   .lang-prompt__box {
     max-width: none;
   }
@@ -732,6 +789,7 @@
     grid-template-columns: 1fr;
   }
   .appearance-panel__footer,
+  .dev-access__actions,
   .lang-prompt__actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
